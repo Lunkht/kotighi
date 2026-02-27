@@ -158,15 +158,19 @@ def apply_theme():
 apply_theme()
 @st.cache_resource
 def get_cyber():
-    np.random.seed(42); N=3000
+    np.random.seed(42); N=4000
     cols = ["requetes_min","duree","octets","ports_scanes","taux_erreur","flag_suspect"]
     n = pd.DataFrame({"requetes_min":np.random.randint(5,300,N//2),"duree":np.random.randint(10,120,N//2),"octets":np.random.randint(500,10000,N//2),"ports_scanes":np.random.randint(1,4,N//2),"taux_erreur":np.random.uniform(0,.1,N//2),"flag_suspect":np.zeros(N//2)})
     a = pd.DataFrame({"requetes_min":np.random.randint(500,8000,N//2),"duree":np.random.randint(0,5,N//2),"octets":np.random.randint(10,300,N//2),"ports_scanes":np.random.randint(20,200,N//2),"taux_erreur":np.random.uniform(.5,1.,N//2),"flag_suspect":np.ones(N//2)})
     df = pd.concat([n.assign(label=0),a.assign(label=1)]).sample(frac=1,random_state=42)
     X,y = df.drop("label",axis=1),df["label"]
     sc = StandardScaler(); Xs = sc.fit_transform(X)
-    m = RandomForestClassifier(n_estimators=150,random_state=42,n_jobs=-1); m.fit(Xs,y)
-    return m,sc
+    
+    # --- MULTI-MODÈLE : RF + GB ---
+    m_rf = RandomForestClassifier(n_estimators=150,random_state=42,n_jobs=-1); m_rf.fit(Xs,y)
+    m_gb = GradientBoostingClassifier(n_estimators=100,random_state=42); m_gb.fit(Xs,y)
+    
+    return m_rf,m_gb,sc
 
 @st.cache_resource
 def get_sante():
@@ -192,16 +196,21 @@ def get_sante():
 
 # ── PAGE LOGIN ────────────────────────────────────────────────────
 def page_login():
-    mode = st.radio("Action", ["Connexion", "Inscription"], horizontal=True, label_visibility="collapsed")
+    if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
+    
+    mode = st.radio("Action", ["Connexion", "Inscription"], 
+                    index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                    horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+    st.session_state.auth_mode = mode
     
     st.markdown(f"""<div style='text-align:center;padding:20px 0 10px'>
         <div style='font-family:Syne,sans-serif;font-size:2.5rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
-        <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{mode.upper()}</div>
+        <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{st.session_state.auth_mode.upper()}</div>
     </div>""", unsafe_allow_html=True)
     
     _,col,_ = st.columns([1,1.2,1])
     with col:
-        if mode == "Connexion":
+        if st.session_state.auth_mode == "Connexion":
             st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
                 <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
                 <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Identifiez-vous pour acceder a la plateforme</div>
@@ -241,7 +250,9 @@ def page_login():
                         "acces": ["Accueil", "Cybersecurite", "Dashboard"] if new_role == "Analyste Cyber" else ["Accueil", "Sante", "Dashboard"]
                     }
                     st.success("Compte cree avec succes ! Connectez-vous.")
-                    time.sleep(1)
+                    st.session_state.auth_mode = "Connexion"
+                    time.sleep(1.5)
+                    st.rerun()
                 else:
                     st.error("Veuillez remplir tous les champs.")
 
@@ -293,7 +304,7 @@ def app():
     # CYBERSECURITE
     elif page == "Cybersecurite":
         st.markdown("## Detection d'intrusion reseau"); st.divider()
-        mc,sc = get_cyber()
+        m_rf, m_gb, sc = get_cyber()
         col1,col2 = st.columns(2)
         with col1:
             st.markdown("### Parametres")
@@ -312,40 +323,57 @@ def app():
                 with st.spinner("Analyse du trafic réseau en cours..."):
                     time.sleep(1.2) # Simulation de calcul
                     feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
-                pred  = mc.predict(sc.transform(feat))[0]
-                proba = mc.predict_proba(sc.transform(feat))[0]
-                conf  = max(proba)*100
-                if pred==0:
-                    type_att="Normal"
-                    st.toast("✅ Connexion normale détectée", icon="🟢")
-                    st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
-                else:
-                    type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
-                    st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
-                    st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
-                fig = go.Figure(go.Indicator(mode="gauge+number",value=proba[1]*100,
-                    title={"text":"Score de Risque","font":{"color":"#e8e8f0","family":"Syne"}},
-                    gauge={"axis":{"range":[0,100]},"bar":{"color":"#ff4757" if pred==1 else "#00f5c4"},"bgcolor":"#111118","bordercolor":"#1e1e2e",
-                           "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
-                    number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
-                fig.update_layout(paper_bgcolor="#111118",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
-                st.plotly_chart(fig,use_container_width=True)
-                
-                # --- GENERATION RAPPORT PDF ---
-                try:
-                    from rapport_pdf import generer_rapport_cyber
-                    pdf_cyber = generer_rapport_cyber({
-                        "ip": ip, "requetes": req, "duree": dur,
-                        "octets": oct_, "ports": ports, "taux_erreur": terr,
-                        "prediction": pred, "type_attaque": type_att, "confiance": conf,
-                        "utilisateur": login, "role": user["role"]
-                    })
-                    st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
-                                     file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
-                except ImportError:
-                    st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
-                
-                st.session_state.historique.append({"Module":"Cybersecurite","Resultat":type_att,"Confiance":f"{conf:.0f}%","Detail":f"IP {ip} {req}req/min","Utilisateur":login})
+                    feat_scaled = sc.transform(feat)
+                    
+                    # --- SYSTÈME DE VOTE (RF + GB) ---
+                    p_rf = m_rf.predict_proba(feat_scaled)[0]
+                    p_gb = m_gb.predict_proba(feat_scaled)[0]
+                    proba_moy = (p_rf + p_gb) / 2
+                    pred = 1 if proba_moy[1] > 0.5 else 0
+                    conf = max(proba_moy) * 100
+                    
+                    if pred==0:
+                        type_att="Normal"
+                        st.toast("✅ Connexion normale détectée", icon="🟢")
+                        st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
+                    else:
+                        type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
+                        st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
+                        st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
+                    
+                    fig = go.Figure(go.Indicator(mode="gauge+number",value=proba_moy[1]*100,
+                        title={"text":"Score de Risque","font":{"color":"#e8e8f0","family":"Syne"}},
+                        gauge={"axis":{"range":[0,100]},"bar":{"color":"#ff4757" if pred==1 else "#00f5c4"},"bgcolor":"#111118","bordercolor":"#1e1e2e",
+                               "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
+                        number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
+                    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
+                    st.plotly_chart(fig,use_container_width=True)
+                    
+                    # --- JOURNALISATION STRUCTURÉE ---
+                    log_entry = {
+                        "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "Module": "Cybersecurite",
+                        "IP": ip,
+                        "Resultat": type_att,
+                        "Confiance": f"{conf:.0f}%",
+                        "Utilisateur": login,
+                        "Score": f"{proba_moy[1]*100:.1f}%"
+                    }
+                    st.session_state.historique.append(log_entry)
+                    
+                    # --- GENERATION RAPPORT PDF ---
+                    try:
+                        from rapport_pdf import generer_rapport_cyber
+                        pdf_cyber = generer_rapport_cyber({
+                            "ip": ip, "requetes": req, "duree": dur,
+                            "octets": oct_, "ports": ports, "taux_erreur": terr,
+                            "prediction": pred, "type_attaque": type_att, "confiance": conf,
+                            "utilisateur": login, "role": user["role"]
+                        })
+                        st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
+                                         file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
+                    except ImportError:
+                        st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
                 if pred==1: st.error("Bloquer l'IP source"); st.warning("Analyser les logs")
                 else: st.success("Connexion autorisee")
 
@@ -395,7 +423,32 @@ def app():
                     fig = px.bar(df_p,x="Probabilite",y="Diagnostic",orientation="h",color="Probabilite",color_continuous_scale=["#1e1e2e","#7c6cff","#ff6b6b"])
                     fig.update_layout(paper_bgcolor="#111118",height=290,margin=dict(t=10,b=10),font={"color":"#e8e8f0","family":"Syne"},showlegend=False,coloraxis_showscale=False,xaxis={"gridcolor":"#1e1e2e","title":"Probabilite (%)"},yaxis={"gridcolor":"#1e1e2e","title":""})
                     st.plotly_chart(fig,use_container_width=True)
-                    st.session_state.historique.append({"Module":"Sante","Resultat":diag,"Confiance":f"{conf:.0f}%","Detail":f"Age {age} {nb} symptomes","Utilisateur":login})
+                    # --- JOURNALISATION STRUCTURÉE ---
+                    log_entry = {
+                        "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "Module": "Sante",
+                        "Resultat": diag,
+                        "Confiance": f"{conf:.0f}%",
+                        "Utilisateur": login,
+                        "Detail": f"Age {age}, {nb} sympt."
+                    }
+                    st.session_state.historique.append(log_entry)
+                    
+                    # --- GENERATION RAPPORT PDF ---
+                    try:
+                        from rapport_pdf import generer_rapport_sante
+                        ALL_SYM = ["fievre","toux","fatigue","maux_tete","douleur_gorge","nausees","douleur_thorax","essoufflement","diarrhee","frissons","perte_odorat","douleurs_musculaires","palpitations","vertiges"]
+                        VAL_SYM = [fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver]
+                        pdf_sante = generer_rapport_sante({
+                            "age": age, "duree_symptomes": dur_s,
+                            "symptomes": [s for s, v in zip(ALL_SYM, VAL_SYM) if v],
+                            "diagnostic": diag, "confiance": conf, "urgent": urgent,
+                            "utilisateur": login, "role": user["role"]
+                        })
+                        st.download_button("📥 Télécharger le rapport PDF", pdf_sante,
+                                         file_name=f"rapport_sante_{login}.pdf", mime="application/pdf")
+                    except ImportError:
+                        st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
                     if urgent: st.error("Appelez le 15 (SAMU)")
                     st.info("Restez hydrate"); st.warning("Consultez un medecin si aggravation")
 
@@ -438,7 +491,17 @@ def app():
             st.markdown("#### Diagnostics cette semaine"); st.plotly_chart(fig2,use_container_width=True)
         if st.session_state.historique:
             st.markdown("#### Historique de la session")
-            st.dataframe(pd.DataFrame(st.session_state.historique[::-1]),use_container_width=True,hide_index=True)
+            df_hist = pd.DataFrame(st.session_state.historique[::-1])
+            st.dataframe(df_hist,use_container_width=True,hide_index=True)
+            
+            # --- EXPORT CSV ---
+            csv = df_hist.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Exporter l'historique (CSV)",
+                data=csv,
+                file_name=f"historique_kotighi_{datetime.datetime.now().strftime('%Y%m%d')}.csv",
+                mime='text/csv',
+            )
         else:
             st.markdown("<div class='infob'>Aucune analyse effectuee. Lancez une analyse depuis Cybersecurite ou Sante.</div>",unsafe_allow_html=True)
 
