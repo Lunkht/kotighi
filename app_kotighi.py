@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import hashlib, time
-from sklearn.ensemble import RandomForestClassifier
+import hashlib, time, datetime
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
 import plotly.express as px
@@ -62,13 +62,19 @@ def apply_theme():
     st.markdown(f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&family=Space+Mono&display=swap');
     
-    html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif;
+    @keyframes fadeInUp {{
+        from {{ opacity: 0; transform: translateY(20px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
     }}
-    
+
     .stApp {{
         background: {bg};
         color: {text};
+        animation: fadeInUp 0.5s ease-out;
+    }}
+    
+    html, body, [class*="css"] {{
+        font-family: 'Inter', sans-serif;
     }}
     
     [data-testid="stSidebar"] {{
@@ -81,6 +87,12 @@ def apply_theme():
         border: 1px solid {border};
         border-radius: 12px;
         padding: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    [data-testid="metric-container"]:hover {{
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        border-color: {primary};
     }}
     
     .stButton>button {{
@@ -91,12 +103,20 @@ def apply_theme():
         font-family: 'Syne', sans-serif;
         font-weight: 700;
         width: 100%;
-        transition: all 0.3s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }}
     
     .stButton>button:hover {{
         background: linear-gradient(135deg, rgba(0,245,196,.3), rgba(124,108,255,.3));
         border-color: {primary};
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,245,196,0.2);
+    }}
+    
+    .stButton>button:active {{
+        transform: translateY(0);
     }}
     
     h1, h2, h3, h4 {{
@@ -109,25 +129,29 @@ def apply_theme():
         color: {text}!important;
         border: 1px solid {border}!important;
         border-radius: 8px!important;
+        transition: border-color 0.3s;
+    }}
+    .stTextInput input:focus {{
+        border-color: {primary}!important;
     }}
     
-    .adanger {{ background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.4); border-radius: 10px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; }}
-    .asuccess {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.3); border-radius: 10px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; }}
+    .adanger {{ background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.4); border-radius: 10px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
+    .asuccess {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.3); border-radius: 10px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
     .awarning {{ background: rgba(255,165,0,.08); border: 1px solid rgba(255,165,0,.3); border-radius: 10px; padding: 16px; color: #ffa502; font-family: 'Space+Mono', monospace; }}
     .infob {{ background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.2); border-radius: 10px; padding: 12px 16px; color: #9d8fff; font-family: 'Space+Mono', monospace; font-size: .8rem; }}
     .ubadge {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.2); border-radius: 10px; padding: 10px 14px; font-family: 'Space+Mono', monospace; font-size: .78rem; color: #00f5c4; }}
     
-    /* Style pour les cartes de l'accueil */
     .feature-card {{
         background: {card};
         border: 1px solid {border};
         border-radius: 16px;
         padding: 24px;
-        transition: transform 0.2s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }}
     .feature-card:hover {{
-        transform: translateY(-5px);
+        transform: translateY(-8px);
         border-color: {primary};
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }}
     </style>""", unsafe_allow_html=True)
 
@@ -283,17 +307,21 @@ def app():
             flag = st.checkbox("Flag suspect",value=False)
             go_c = st.button("ANALYSER LA CONNEXION",type="primary")
         with col2:
-            st.markdown("### Resultat")
+            st.markdown("### Résultat")
             if go_c:
-                feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
+                with st.spinner("Analyse du trafic réseau en cours..."):
+                    time.sleep(1.2) # Simulation de calcul
+                    feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
                 pred  = mc.predict(sc.transform(feat))[0]
                 proba = mc.predict_proba(sc.transform(feat))[0]
                 conf  = max(proba)*100
                 if pred==0:
                     type_att="Normal"
+                    st.toast("✅ Connexion normale détectée", icon="🟢")
                     st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
                 else:
                     type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
+                    st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
                     st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
                 fig = go.Figure(go.Indicator(mode="gauge+number",value=proba[1]*100,
                     title={"text":"Score de Risque","font":{"color":"#e8e8f0","family":"Syne"}},
@@ -348,15 +376,21 @@ def app():
         with col2:
             st.markdown("### Résultat")
             if go_s:
-                nb = sum([fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver])
+                with st.spinner("Analyse des symptômes médicaux..."):
+                    time.sleep(1.5) # Simulation de calcul
+                    nb = sum([fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver])
                 if nb==0: st.warning("Sélectionnez au moins un symptôme.")
                 else:
                     feat = pd.DataFrame([{"fievre":int(fievre),"toux":int(toux),"fatigue":int(fat),"maux_tete":int(tete),"douleur_gorge":int(gorge),"nausees":int(nau),"douleur_thorax":int(thor),"essoufflement":int(ess),"diarrhee":int(diar),"frissons":int(fri),"perte_odorat":int(odo),"douleurs_musculaires":int(mus),"palpitations":int(pal),"vertiges":int(ver)}])
                     pred=ms.predict(feat)[0]; proba=ms.predict_proba(feat)[0]
                     diag=labels[pred]; conf=proba[pred]*100
                     urgent = "cardiaque" in diag.lower() or "covid" in diag.lower()
-                    if urgent: st.markdown(f"<div class='adanger'><strong>CONSULTATION URGENTE</strong><br>Diagnostic : {diag}<br>Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
-                    else: st.markdown(f"<div class='asuccess'><strong>Diagnostic : {diag}</strong><br>Confiance : {conf:.0f}% — {nb} symptôme(s)</div>",unsafe_allow_html=True)
+                    if urgent: 
+                        st.toast(f"🚨 ALERTE CRITIQUE : {diag}", icon="🚨")
+                        st.markdown(f"<div class='adanger'><strong>CONSULTATION URGENTE</strong><br>Diagnostic : {diag}<br>Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
+                    else: 
+                        st.toast(f"🩺 Diagnostic : {diag}", icon="🩺")
+                        st.markdown(f"<div class='asuccess'><strong>Diagnostic : {diag}</strong><br>Confiance : {conf:.0f}% — {nb} symptôme(s)</div>",unsafe_allow_html=True)
                     df_p = pd.DataFrame({"Diagnostic":labels,"Probabilite":proba*100}).sort_values("Probabilite",ascending=True)
                     fig = px.bar(df_p,x="Probabilite",y="Diagnostic",orientation="h",color="Probabilite",color_continuous_scale=["#1e1e2e","#7c6cff","#ff6b6b"])
                     fig.update_layout(paper_bgcolor="#111118",height=290,margin=dict(t=10,b=10),font={"color":"#e8e8f0","family":"Syne"},showlegend=False,coloraxis_showscale=False,xaxis={"gridcolor":"#1e1e2e","title":"Probabilite (%)"},yaxis={"gridcolor":"#1e1e2e","title":""})
@@ -374,6 +408,24 @@ def app():
         with c2: st.metric("Attaques detectees","1 203","+18")
         with c3: st.metric("Taux de detection","99.2%","+0.1%")
         with c4: st.metric("Faux positifs","0.8%","-0.2%")
+        
+        st.markdown("<br>",unsafe_allow_html=True)
+        
+        # --- NOUVEAUX GRAPHIQUES TEMPORELS ---
+        st.markdown("#### Évolution de l'activité (24h)")
+        hours = list(range(24))
+        activity_data = pd.DataFrame({
+            "Heure": hours,
+            "Requêtes": np.random.randint(100, 500, 24),
+            "Risques": np.random.randint(0, 50, 24)
+        })
+        fig_line = px.line(activity_data, x="Heure", y=["Requêtes", "Risques"], 
+                          color_discrete_sequence=["#00f5c4", "#ff4757"],
+                          template="plotly_dark")
+        fig_line.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
+                              height=300, margin=dict(t=20, b=20, l=20, r=20))
+        st.plotly_chart(fig_line, use_container_width=True)
+
         st.markdown("<br>",unsafe_allow_html=True)
         cl,cr = st.columns(2)
         with cl:
