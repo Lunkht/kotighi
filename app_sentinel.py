@@ -267,7 +267,7 @@ with st.sidebar:
     st.divider()
     st.markdown("""
     <div class="info-banner">
-    ⚠️ Prototype
+    Prototype
     </div>
     """, unsafe_allow_html=True)
 
