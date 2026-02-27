@@ -23,7 +23,7 @@ import plotly.express as px
 
 # ── Configuration de la page ────────────────────────────────
 st.set_page_config(
-    page_title="SENTINEL AI",
+    page_title="KOTIGHI AI",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -245,7 +245,7 @@ with st.sidebar:
         <div style="font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800;
                     background:linear-gradient(90deg,#00f5c4,#7c6cff);
                     -webkit-background-clip:text; -webkit-text-fill-color:transparent">
-            SENTINEL AI
+            KOTIGHI AI
         </div>
         <div style="font-family:'Space Mono',monospace; font-size:0.7rem;
                     color:#666680; letter-spacing:2px; margin-top:4px">
@@ -258,18 +258,16 @@ with st.sidebar:
 
     st.markdown("### 📌 Navigation")
     page = st.radio("", [
-        "🏠 Accueil",
-        "🔐 Cybersécurité",
-        "🏥 Santé",
-        "📊 Dashboard"
+        "Accueil",
+        "Cybersécurité",
+        "Santé",
+        "Dashboard"
     ], label_visibility="collapsed")
 
     st.divider()
     st.markdown("""
     <div class="info-banner">
-    ⚠️ Prototype éducatif.<br>
-    Ne remplace pas un expert<br>
-    en sécurité ni un médecin.
+    ⚠️ Prototype
     </div>
     """, unsafe_allow_html=True)
 
