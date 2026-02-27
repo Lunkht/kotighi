@@ -10,20 +10,7 @@ import plotly.express as px
 st.set_page_config(page_title="KOTIGHI AI", layout="wide")
 
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono&display=swap');
-html,body,[class*="css"]{font-family:'Syne',sans-serif}
-.stApp{background:#0a0a0f;color:#e8e8f0}
-[data-testid="stSidebar"]{background:#111118!important;border-right:1px solid #1e1e2e}
-[data-testid="metric-container"]{background:#111118;border:1px solid #1e1e2e;border-radius:12px;padding:16px}
-.stButton>button{background:linear-gradient(135deg,rgba(0,245,196,.15),rgba(124,108,255,.15));color:#00f5c4;border:1px solid rgba(0,245,196,.4);border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;width:100%}
-.stButton>button:hover{background:linear-gradient(135deg,rgba(0,245,196,.3),rgba(124,108,255,.3))}
-h1,h2,h3{font-family:'Syne',sans-serif!important}
-.stTextInput input{background:#0a0a0f!important;color:#e8e8f0!important;border:1px solid #1e1e2e!important;border-radius:8px!important}
-.adanger{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.4);border-radius:10px;padding:16px;color:#ff4757;font-family:'Space Mono',monospace}
-.asuccess{background:rgba(0,245,196,.08);border:1px solid rgba(0,245,196,.3);border-radius:10px;padding:16px;color:#00f5c4;font-family:'Space Mono',monospace}
-.awarning{background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.3);border-radius:10px;padding:16px;color:#ffa502;font-family:'Space Mono',monospace}
-.infob{background:rgba(124,108,255,.08);border:1px solid rgba(124,108,255,.2);border-radius:10px;padding:12px 16px;color:#9d8fff;font-family:'Space Mono',monospace;font-size:.8rem}
-.ubadge{background:rgba(0,245,196,.08);border:1px solid rgba(0,245,196,.2);border-radius:10px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:.78rem;color:#00f5c4}
+/* Style de base supprimé car géré par apply_theme() */
 </style>""", unsafe_allow_html=True)
 
 # ── AUTH ──────────────────────────────────────────────────────────
@@ -40,10 +27,93 @@ def verifier(login, mdp):
     if l in USERS and USERS[l]["hash"] == h(mdp): return USERS[l]
     return None
 
-for k,v in {"connecte":False,"utilisateur":None,"login_nom":None,"tentatives":0,"historique":[]}.items():
+for k,v in {"connecte":False,"utilisateur":None,"login_nom":None,"tentatives":0,"historique":[],"theme":"Sombre"}.items():
     if k not in st.session_state: st.session_state[k] = v
 
-# ── MODELES ───────────────────────────────────────────────────────
+# ── THEME CSS ────────────────────────────────────────────────────
+def apply_theme():
+    is_dark = st.session_state.theme == "Sombre"
+    bg = "#0a0a0f" if is_dark else "#f8f9fa"
+    text = "#e8e8f0" if is_dark else "#212529"
+    card = "#111118" if is_dark else "#ffffff"
+    border = "#1e1e2e" if is_dark else "#dee2e6"
+    subtext = "#666680" if is_dark else "#6c757d"
+    primary = "#00f5c4"
+    accent = "#7c6cff"
+
+    st.markdown(f"""<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&family=Space+Mono&display=swap');
+    
+    html, body, [class*="css"] {{
+        font-family: 'Inter', sans-serif;
+    }}
+    
+    .stApp {{
+        background: {bg};
+        color: {text};
+    }}
+    
+    [data-testid="stSidebar"] {{
+        background: {card}!important;
+        border-right: 1px solid {border};
+    }}
+    
+    [data-testid="metric-container"] {{
+        background: {card};
+        border: 1px solid {border};
+        border-radius: 12px;
+        padding: 16px;
+    }}
+    
+    .stButton>button {{
+        background: linear-gradient(135deg, rgba(0,245,196,.15), rgba(124,108,255,.15));
+        color: {primary};
+        border: 1px solid rgba(0,245,196,.4);
+        border-radius: 10px;
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.3s;
+    }}
+    
+    .stButton>button:hover {{
+        background: linear-gradient(135deg, rgba(0,245,196,.3), rgba(124,108,255,.3));
+        border-color: {primary};
+    }}
+    
+    h1, h2, h3, h4 {{
+        font-family: 'Syne', sans-serif!important;
+        color: {text}!important;
+    }}
+    
+    .stTextInput input, .stNumberInput input, .stSelectbox select {{
+        background: {bg}!important;
+        color: {text}!important;
+        border: 1px solid {border}!important;
+        border-radius: 8px!important;
+    }}
+    
+    .adanger {{ background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.4); border-radius: 10px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; }}
+    .asuccess {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.3); border-radius: 10px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; }}
+    .awarning {{ background: rgba(255,165,0,.08); border: 1px solid rgba(255,165,0,.3); border-radius: 10px; padding: 16px; color: #ffa502; font-family: 'Space+Mono', monospace; }}
+    .infob {{ background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.2); border-radius: 10px; padding: 12px 16px; color: #9d8fff; font-family: 'Space+Mono', monospace; font-size: .8rem; }}
+    .ubadge {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.2); border-radius: 10px; padding: 10px 14px; font-family: 'Space+Mono', monospace; font-size: .78rem; color: #00f5c4; }}
+    
+    /* Style pour les cartes de l'accueil */
+    .feature-card {{
+        background: {card};
+        border: 1px solid {border};
+        border-radius: 16px;
+        padding: 24px;
+        transition: transform 0.2s;
+    }}
+    .feature-card:hover {{
+        transform: translateY(-5px);
+        border-color: {primary};
+    }}
+    </style>""", unsafe_allow_html=True)
+
+apply_theme()
 @st.cache_resource
 def get_cyber():
     np.random.seed(42); N=3000
@@ -113,6 +183,8 @@ def app():
     login = st.session_state.login_nom
 
     with st.sidebar:
+        st.session_state.theme = st.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
+        apply_theme()
         st.markdown(f"""<div style='text-align:center;padding:16px 0'>
             <div style='font-family:Syne,sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
         </div>
@@ -138,9 +210,9 @@ def app():
         st.divider()
         c1,c2 = st.columns(2)
         if "Cybersecurite" in user["acces"]:
-            with c1: st.markdown("<div style='background:#111118;border:1px solid #1e1e2e;border-radius:16px;padding:24px'><div style='font-size:1.1rem;font-weight:700;color:#00f5c4;margin-bottom:8px'>Module Cybersecurite</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Detection d&#39;intrusions, DDoS, scans de ports et brute force.</div></div>", unsafe_allow_html=True)
+            with c1: st.markdown("<div class='feature-card'><div style='font-size:1.1rem;font-weight:700;color:#00f5c4;margin-bottom:8px'>Module Cybersecurite</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Detection d&#39;intrusions, DDoS, scans de ports et brute force.</div></div>", unsafe_allow_html=True)
         if "Sante" in user["acces"]:
-            with c2: st.markdown("<div style='background:#111118;border:1px solid #1e1e2e;border-radius:16px;padding:24px'><div style='font-size:1.1rem;font-weight:700;color:#ff6b6b;margin-bottom:8px'>Module Sante</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Analyse des symptomes et prediction parmi 6 pathologies.</div></div>", unsafe_allow_html=True)
+            with c2: st.markdown("<div class='feature-card'><div style='font-size:1.1rem;font-weight:700;color:#ff6b6b;margin-bottom:8px'>Module Sante</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Analyse des symptomes et prediction parmi 6 pathologies.</div></div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         c1,c2,c3,c4 = st.columns(4)
         with c1: st.metric("Precision cyber","98%+","NSL-KDD reel")
@@ -183,7 +255,22 @@ def app():
                            "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
                     number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
                 fig.update_layout(paper_bgcolor="#111118",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
-                st.plotly_chart(fig,use_container_width=True) 
+                st.plotly_chart(fig,use_container_width=True)
+                
+                # --- GENERATION RAPPORT PDF ---
+                try:
+                    from rapport_pdf import generer_rapport_cyber
+                    pdf_cyber = generer_rapport_cyber({
+                        "ip": ip, "requetes": req, "duree": dur,
+                        "octets": oct_, "ports": ports, "taux_erreur": terr,
+                        "prediction": pred, "type_attaque": type_att, "confiance": conf,
+                        "utilisateur": login, "role": user["role"]
+                    })
+                    st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
+                                     file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
+                except ImportError:
+                    st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
+                
                 st.session_state.historique.append({"Module":"Cybersecurite","Resultat":type_att,"Confiance":f"{conf:.0f}%","Detail":f"IP {ip} {req}req/min","Utilisateur":login})
                 if pred==1: st.error("Bloquer l'IP source"); st.warning("Analyser les logs")
                 else: st.success("Connexion autorisee")
@@ -262,6 +349,8 @@ def app():
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
+    st.session_state.theme = st.sidebar.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
+    apply_theme()
     page_login()
 else:
     app()
