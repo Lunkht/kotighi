@@ -1,5 +1,5 @@
 # ============================================================
-#  SENTINEL AI — Ton premier modèle d'IA en Python
+#  KOTIGHI AI — Ton premier modèle d'IA en Python
 #  Modules : Cybersécurité + Santé
 #  Niveau   : Débutant
 #  Auteur   : Toi 🚀 (avec l'aide de Claude)
@@ -10,7 +10,7 @@
 #  2. Installe les bibliothèques nécessaires :
 #       pip install scikit-learn pandas numpy
 #  3. Lance le fichier :
-#       python sentinel_ai.py
+#       python kotighi_ai.py
 #
 # ============================================================
 
@@ -255,7 +255,7 @@ def module_sante():
 
 if __name__ == "__main__":
     print("\n" + "🛡️ " * 18)
-    print("   SENTINEL AI — Plateforme IA Cybersécurité & Santé")
+    print("   KOTIGHI AI — Plateforme IA Cybersécurité & Santé")
     print("🛡️ " * 18)
 
     # Lancer le module cybersécurité
@@ -280,7 +280,7 @@ if __name__ == "__main__":
 
   3. Crée une interface web avec Streamlit :
      • pip install streamlit
-     • streamlit run sentinel_ai.py
+     • streamlit run app_kotighi.py
 
   4. Ressource gratuite pour apprendre :
      • scikit-learn.org/stable/tutorial

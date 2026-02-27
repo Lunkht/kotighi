@@ -1,5 +1,5 @@
 # ============================================================
-#  SENTINEL AI — Cybersécurité avec Dataset NSL-KDD
+#  KOTIGHI AI — Cybersécurité avec Dataset NSL-KDD
 #  Ce fichier utilise les VRAIES colonnes du dataset NSL-KDD
 #  (le standard mondial pour la détection d'intrusion réseau)
 # ============================================================
@@ -320,7 +320,7 @@ def detecteur_temps_reel(modele, scaler, feature_cols):
 
 if __name__ == "__main__":
     print("\n" + "🛡️ " * 20)
-    print("  SENTINEL AI — Cybersécurité avec Dataset NSL-KDD")
+    print("  KOTIGHI AI — Cybersécurité avec Dataset NSL-KDD")
     print("🛡️ " * 20)
 
     # 1. Charger les données
@@ -357,5 +357,5 @@ if __name__ == "__main__":
 
   ③ Crée une interface web :
       → pip install streamlit
-      → on code ensemble l'app visuelle !
+      → on code ensemble l'app visuelle (app_kotighi.py) !
   """)

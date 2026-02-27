@@ -1,5 +1,5 @@
 # ============================================================
-#  SENTINEL AI — Interface Web avec Streamlit
+#  KOTIGHI AI — Interface Web avec Streamlit
 #  Cybersécurité + Santé
 # ============================================================
 #
@@ -7,7 +7,7 @@
 #  pip install streamlit scikit-learn pandas numpy plotly
 #
 #  LANCEMENT :
-#  streamlit run app_sentinel.py
+#  streamlit run app_kotighi.py
 #
 #  → Ouvre automatiquement dans ton navigateur sur :
 #    http://localhost:8501
@@ -289,7 +289,7 @@ if page == "🏠 Accueil":
         <h1 style="font-size:3rem; font-weight:800;
                    background:linear-gradient(90deg,#00f5c4,#7c6cff,#ff6b6b);
                    -webkit-background-clip:text; -webkit-text-fill-color:transparent">
-            SENTINEL AI
+            KOTIGHI AI
         </h1>
         <p style="color:#666680; font-family:'Space Mono',monospace;
                   letter-spacing:3px; font-size:0.8rem">
