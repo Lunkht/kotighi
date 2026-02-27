@@ -1,4 +1,4 @@
-# 🛡️ SENTINEL AI — Cybersécurité & Santé
+# 🛡️ KOTIGHI AI — Cybersécurité & Santé
 
 Plateforme d'intelligence artificielle combinant **détection d'intrusion réseau** et **analyse médicale de symptômes**.
 
@@ -40,14 +40,14 @@ Plateforme d'intelligence artificielle combinant **détection d'intrusion résea
 
 ```bash
 # 1. Clone le dépôt
-git clone https://github.com/TON_USERNAME/sentinel-ai.git
-cd sentinel-ai
+git clone https://github.com/TON_USERNAME/kotighi.git
+cd kotighi
 
 # 2. Installe les dépendances
 pip install -r requirements.txt
 
 # 3. Lance l'application
-streamlit run app_sentinel.py
+streamlit run app_kotighi.py
 ```
 
 L'app s'ouvre sur → **http://localhost:8501**
@@ -57,10 +57,10 @@ L'app s'ouvre sur → **http://localhost:8501**
 ## 📁 Structure du projet
 
 ```
-sentinel-ai/
+kotighi/
 │
-├── app_sentinel.py       ← Application web principale (Streamlit)
-├── sentinel_ai.py        ← Modèles IA de base
+├── app_kotighi.py        ← Application web principale (Streamlit)
+├── kotighi_ai.py         ← Modèles IA de base
 ├── cyber_nslkdd.py       ← Module cybersécurité avancé (NSL-KDD)
 ├── requirements.txt      ← Dépendances Python
 ├── .streamlit/
