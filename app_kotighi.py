@@ -183,7 +183,7 @@ def app():
                            "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
                     number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
                 fig.update_layout(paper_bgcolor="#111118",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
-                st.plotly_chart(fig,use_container_width=True)
+                st.plotly_chart(fig,use_container_width=True) 
                 st.session_state.historique.append({"Module":"Cybersecurite","Resultat":type_att,"Confiance":f"{conf:.0f}%","Detail":f"IP {ip} {req}req/min","Utilisateur":login})
                 if pred==1: st.error("Bloquer l'IP source"); st.warning("Analyser les logs")
                 else: st.success("Connexion autorisee")
