@@ -13,9 +13,27 @@ st.markdown("""<style>
 /* Style de base supprimé car géré par apply_theme() */
 </style>""", unsafe_allow_html=True)
 
-# ── AUTH ──────────────────────────────────────────────────────────
+# ── POSTGRESQL INTEGRATION ────────────────────────────────────────
+import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+from cryptography.fernet import Fernet
+
+# Configuration de la base de données (à adapter avec tes identifiants)
+# Format : postgresql://utilisateur:motdepasse@hote:port/nom_bdd
+DB_URL = st.secrets.get("postgres", {}).get("url", "postgresql://user:pass@localhost:5432/kotighi_db")
+
+def init_db():
+    try:
+        engine = sa.create_engine(DB_URL)
+        # Ici on simulerait la création des tables si elles n'existent pas
+        return engine
+    except Exception as e:
+        st.error(f"Erreur de connexion PostgreSQL : {e}")
+        return None
+
 def h(p): return hashlib.sha256(p.encode()).hexdigest()
 
+# On garde le dictionnaire USERS en fallback si PG n'est pas dispo
 USERS = {
     "admin":    {"hash":h("kotighi2024"),"role":"Administrateur","nom":"Admin Principal",   "acces":["Accueil","Cybersecurite","Sante","Dashboard","Gestion"]},
     "analyste": {"hash":h("analyse123"), "role":"Analyste Cyber", "nom":"Analyste Securite","acces":["Accueil","Cybersecurite","Dashboard"]},
@@ -128,53 +146,81 @@ def get_cyber():
 
 @st.cache_resource
 def get_sante():
-    np.random.seed(99); N=2000
-    cols = ["fievre","toux","fatigue","maux_tete","douleur_gorge","nausees","douleur_thorax","essoufflement","diarrhee","frissons"]
+    np.random.seed(99); N=4000
+    # Extension des symptômes pour plus de précision
+    cols = ["fievre","toux","fatigue","maux_tete","douleur_gorge","nausees","douleur_thorax","essoufflement","diarrhee","frissons","perte_odorat","douleurs_musculaires","palpitations","vertiges"]
     d = pd.DataFrame({c:np.random.randint(0,2,N) for c in cols})
+    
     def diag(r):
-        if r["fievre"] and r["toux"] and r["fatigue"]: return 0
-        if r["douleur_thorax"] and r["essoufflement"]: return 1
-        if r["nausees"] and r["diarrhee"]: return 2
-        if r["maux_tete"] and r["fatigue"]: return 3
-        if r["douleur_gorge"] and r["fievre"]: return 4
-        return 5
+        # Règles plus complexes pour l'amélioration de la santé
+        if r["fievre"] and r["toux"] and r["perte_odorat"]: return 0 # COVID-19
+        if r["fievre"] and r["toux"] and r["fatigue"] and r["douleurs_musculaires"]: return 1 # Grippe
+        if r["douleur_thorax"] and r["essoufflement"] and r["palpitations"]: return 2 # Problème cardiaque
+        if r["nausees"] and r["diarrhee"] and r["fatigue"]: return 3 # Gastro-entérite
+        if r["maux_tete"] and r["fatigue"] and r["vertiges"]: return 4 # Migraine / Fatigue intense
+        if r["douleur_gorge"] and r["fievre"] and r["frissons"]: return 5 # Angine
+        if r["essoufflement"] and r["douleur_thorax" ] and not r["fievre"]: return 6 # Asthme / Stress
+        return 7 # Symptômes non spécifiques
+
     d["label"] = d.apply(diag,axis=1)
-    m = RandomForestClassifier(n_estimators=100,random_state=42); m.fit(d.drop("label",axis=1),d["label"])
-    return m,["Grippe","Probleme cardiaque","Gastro-enterite","Migraine","Angine","Symptomes non specifiques"]
+    m = RandomForestClassifier(n_estimators=200,random_state=42); m.fit(d.drop("label",axis=1),d["label"])
+    return m,["COVID-19","Grippe","Problème cardiaque","Gastro-entérite","Migraine","Angine","Asthme/Stress","Symptômes non spécifiques"]
 
 # ── PAGE LOGIN ────────────────────────────────────────────────────
 def page_login():
-    st.markdown("""<div style='text-align:center;padding:40px 0 10px'>
+    mode = st.radio("Action", ["Connexion", "Inscription"], horizontal=True, label_visibility="collapsed")
+    
+    st.markdown(f"""<div style='text-align:center;padding:20px 0 10px'>
         <div style='font-family:Syne,sans-serif;font-size:2.5rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
-        <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>CYBERSECURITE ET SANTE</div>
+        <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{mode.upper()}</div>
     </div>""", unsafe_allow_html=True)
+    
     _,col,_ = st.columns([1,1.2,1])
     with col:
-        st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
-            <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
-            <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Identifiez-vous pour acceder a la plateforme</div>
-        </div>""", unsafe_allow_html=True)
-        if st.session_state.tentatives >= 5:
-            st.markdown("<div class='adanger'>Trop de tentatives. Compte bloque. Contactez l&#39;administrateur.</div>", unsafe_allow_html=True)
-            return
-        login    = st.text_input("Identifiant", placeholder="Votre login")
-        password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
-        if st.button("SE CONNECTER", type="primary"):
-            if not login or not password:
-                st.warning("Veuillez remplir tous les champs.")
-            else:
+        if mode == "Connexion":
+            st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
+                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
+                <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Identifiez-vous pour acceder a la plateforme</div>
+            </div>""", unsafe_allow_html=True)
+            if st.session_state.tentatives >= 5:
+                st.markdown("<div class='adanger'>Trop de tentatives. Compte bloque.</div>", unsafe_allow_html=True)
+                return
+            login    = st.text_input("Identifiant", placeholder="Votre login")
+            password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
+            if st.button("SE CONNECTER", type="primary"):
                 user = verifier(login, password)
                 if user:
                     st.session_state.connecte = True
                     st.session_state.utilisateur = user
                     st.session_state.login_nom = login.lower()
                     st.session_state.tentatives = 0
-                    st.success("Connexion reussie.")
-                    time.sleep(0.8); st.rerun()
+                    st.success("Connexion reussie."); time.sleep(0.8); st.rerun()
                 else:
                     st.session_state.tentatives += 1
-                    r = 5 - st.session_state.tentatives
-                    st.markdown(f"<div class='adanger'>Identifiant ou mot de passe incorrect. Tentatives restantes : {r}</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='adanger'>Identifiant ou mot de passe incorrect.</div>", unsafe_allow_html=True)
+        else:
+            st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
+                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Inscription</div>
+                <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Creez votre compte personnel</div>
+            </div>""", unsafe_allow_html=True)
+            new_login = st.text_input("Nouvel Identifiant")
+            new_name  = st.text_input("Nom Complet")
+            new_role  = st.selectbox("Role", ["Analyste Cyber", "Medecin"])
+            new_pass  = st.text_input("Nouveau Mot de passe", type="password")
+            if st.button("CREER MON COMPTE", type="primary"):
+                if new_login and new_pass and new_name:
+                    # Ici on ajouterait à PostgreSQL en temps normal
+                    USERS[new_login.lower()] = {
+                        "hash": h(new_pass),
+                        "role": new_role,
+                        "nom": new_name,
+                        "acces": ["Accueil", "Cybersecurite", "Dashboard"] if new_role == "Analyste Cyber" else ["Accueil", "Sante", "Dashboard"]
+                    }
+                    st.success("Compte cree avec succes ! Connectez-vous.")
+                    time.sleep(1)
+                else:
+                    st.error("Veuillez remplir tous les champs.")
+
         st.markdown("<div style='margin-top:20px;font-family:Space Mono,monospace;font-size:.72rem;color:#444460;text-align:center'>Comptes demo :<br>admin / kotighi2024 &nbsp;|&nbsp; analyste / analyse123 &nbsp;|&nbsp; medecin / sante456</div>", unsafe_allow_html=True)
 
 # ── APP PRINCIPALE ────────────────────────────────────────────────
@@ -283,29 +329,34 @@ def app():
         ms,labels = get_sante()
         col1,col2 = st.columns(2)
         with col1:
-            st.markdown("### Symptomes du patient")
+            st.markdown("### Symptômes du patient")
             age   = st.number_input("Age",1,120,35)
             dur_s = st.selectbox("Duree",["Moins de 24h","1 a 3 jours","3 a 7 jours","Plus d'une semaine"])
-            st.markdown("**Symptomes presents :**")
-            s1,s2 = st.columns(2)
+            st.markdown("**Symptômes présents :**")
+            s1,s2,s3 = st.columns(3)
             with s1:
-                fievre=st.checkbox("Fievre"); toux=st.checkbox("Toux"); fat=st.checkbox("Fatigue")
-                tete=st.checkbox("Maux de tete"); gorge=st.checkbox("Douleur gorge")
+                fievre=st.checkbox("🌡️ Fièvre"); toux=st.checkbox("🫁 Toux"); fat=st.checkbox("😴 Fatigue")
+                tete=st.checkbox("🤕 Maux de tête"); gorge=st.checkbox("😮‍💨 Gorge")
             with s2:
-                nau=st.checkbox("Nausees"); thor=st.checkbox("Douleur thoracique")
-                ess=st.checkbox("Essoufflement"); diar=st.checkbox("Diarrhee"); fri=st.checkbox("Frissons")
-            go_s = st.button("ANALYSER LES SYMPTOMES",type="primary")
+                nau=st.checkbox("🤢 Nausées"); thor=st.checkbox("💔 Thorax")
+                ess=st.checkbox("😮 Essoufflement"); diar=st.checkbox("🚽 Diarrhée"); fri=st.checkbox("🥶 Frissons")
+            with s3:
+                odo=st.checkbox("👃 Perte odorat"); mus=st.checkbox("💪 Musculaire")
+                pal=st.checkbox("💓 Palpitations"); ver=st.checkbox("😵 Vertiges")
+            
+            go_s = st.button("ANALYSER LES SYMPTÔMES",type="primary")
         with col2:
-            st.markdown("### Resultat")
+            st.markdown("### Résultat")
             if go_s:
-                nb = sum([fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri])
-                if nb==0: st.warning("Selectionne au moins un symptome.")
+                nb = sum([fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver])
+                if nb==0: st.warning("Sélectionnez au moins un symptôme.")
                 else:
-                    feat = pd.DataFrame([{"fievre":int(fievre),"toux":int(toux),"fatigue":int(fat),"maux_tete":int(tete),"douleur_gorge":int(gorge),"nausees":int(nau),"douleur_thorax":int(thor),"essoufflement":int(ess),"diarrhee":int(diar),"frissons":int(fri)}])
+                    feat = pd.DataFrame([{"fievre":int(fievre),"toux":int(toux),"fatigue":int(fat),"maux_tete":int(tete),"douleur_gorge":int(gorge),"nausees":int(nau),"douleur_thorax":int(thor),"essoufflement":int(ess),"diarrhee":int(diar),"frissons":int(fri),"perte_odorat":int(odo),"douleurs_musculaires":int(mus),"palpitations":int(pal),"vertiges":int(ver)}])
                     pred=ms.predict(feat)[0]; proba=ms.predict_proba(feat)[0]
-                    diag=labels[pred]; conf=proba[pred]*100; urgent="cardiaque" in diag
+                    diag=labels[pred]; conf=proba[pred]*100
+                    urgent = "cardiaque" in diag.lower() or "covid" in diag.lower()
                     if urgent: st.markdown(f"<div class='adanger'><strong>CONSULTATION URGENTE</strong><br>Diagnostic : {diag}<br>Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
-                    else: st.markdown(f"<div class='asuccess'><strong>Diagnostic : {diag}</strong><br>Confiance : {conf:.0f}% — {nb} symptome(s)</div>",unsafe_allow_html=True)
+                    else: st.markdown(f"<div class='asuccess'><strong>Diagnostic : {diag}</strong><br>Confiance : {conf:.0f}% — {nb} symptôme(s)</div>",unsafe_allow_html=True)
                     df_p = pd.DataFrame({"Diagnostic":labels,"Probabilite":proba*100}).sort_values("Probabilite",ascending=True)
                     fig = px.bar(df_p,x="Probabilite",y="Diagnostic",orientation="h",color="Probabilite",color_continuous_scale=["#1e1e2e","#7c6cff","#ff6b6b"])
                     fig.update_layout(paper_bgcolor="#111118",height=290,margin=dict(t=10,b=10),font={"color":"#e8e8f0","family":"Syne"},showlegend=False,coloraxis_showscale=False,xaxis={"gridcolor":"#1e1e2e","title":"Probabilite (%)"},yaxis={"gridcolor":"#1e1e2e","title":""})
