@@ -658,65 +658,52 @@ def app():
 
     # SANTE
     elif page == "Sante":
-        # --- THEME CLINIQUE FUTURISTE ---
-        st.markdown("""
+        # --- THEME CLINIQUE FUTURISTE (ADAPTÉ) ---
+        is_dark = st.session_state.theme == "Sombre"
+        card_bg = "rgba(17, 17, 24, 0.7)" if is_dark else "rgba(255, 255, 255, 0.85)"
+        text_col = "#e8e8f0" if is_dark else "#2c3e50"
+        border_col = "rgba(255, 255, 255, 0.1)" if is_dark else "rgba(255, 255, 255, 0.4)"
+        
+        st.markdown(f"""
         <style>
-        /* Override spécifique pour la page Santé */
-        [data-testid="stAppViewContainer"] {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-        
-        /* Force Text Color Dark for Health Module */
-        .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown span, .stMarkdown div {
-            color: #2c3e50 !important;
-        }
-        .stSlider label, .stSelectbox label, .stNumberInput label {
-            color: #2c3e50 !important;
-        }
-        
-        /* Tabs Styling */
-        .stTabs [data-baseweb="tab-list"] {
-            background-color: rgba(255,255,255,0.5);
+        /* Tabs Styling Adaptatif */
+        .stTabs [data-baseweb="tab-list"] {{
+            background-color: {card_bg};
             border-radius: 10px;
             padding: 5px;
-        }
-        .stTabs [data-baseweb="tab"] {
-            color: #636e72 !important;
-        }
-        .stTabs [data-baseweb="tab"][aria-selected="true"] {
-            background-color: white;
+            border: 1px solid {border_col};
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            color: #666 !important;
+        }}
+        .stTabs [data-baseweb="tab"][aria-selected="true"] {{
+            background-color: {'#1e1e2e' if is_dark else 'white'};
             color: #00d2d3 !important;
             font-weight: 800;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }}
         
-        /* Toggles Styling */
-        .stToggle label {
-            color: #2d3436 !important;
-            font-weight: 600;
-        }
-        
-        .clinic-card {
-            background: rgba(255, 255, 255, 0.9);
+        .clinic-card {{
+            background: {card_bg};
             backdrop-filter: blur(12px);
             padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid {border_col};
             border-left: 6px solid #00d2d3;
-        }
-        .clinic-header {
+        }}
+        .clinic-header {{
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            color: #2c3e50 !important;
+            color: {text_col} !important;
             margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        .stButton>button {
+        }}
+        .stButton>button {{
             border-radius: 12px;
             font-weight: 700;
             text-transform: uppercase;
@@ -726,11 +713,11 @@ def app():
             background: linear-gradient(135deg, #00d2d3 0%, #00b894 100%) !important;
             color: white !important;
             border: none !important;
-        }
-        .stButton>button:hover {
+        }}
+        .stButton>button:hover {{
             transform: translateY(-2px);
             box-shadow: 0 7px 14px rgba(0,0,0,0.15);
-        }
+        }}
         </style>
         """, unsafe_allow_html=True)
 
