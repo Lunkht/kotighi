@@ -517,24 +517,29 @@ def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
     st.markdown("""<style>
-    div[role="radiogroup"] { 
-        justify-content: center !important;
-        margin-bottom: 25px;
-        transform: scale(1.1);
-        width: 100% !important;
+    /* CSS pour centrer le groupe de boutons radio */
+    div.row-widget.stRadio > div {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
-    div[data-testid="stRadio"] {
+    div[role="radiogroup"] {
+        width: 100%;
         display: flex;
         justify-content: center;
+        gap: 20px;
+    }
+    /* Ajustement de la taille des labels */
+    div[role="radiogroup"] label {
+        font-size: 1.1rem !important;
+        padding: 0 10px;
     }
     </style>""", unsafe_allow_html=True)
 
-    # 1. BOUTONS RADIO (Centrés en haut)
-    _, c_r, _ = st.columns([1, 1.5, 1])
-    with c_r:
-        mode = st.radio("Action", ["Connexion", "Inscription"], 
-                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+    # 1. BOUTONS RADIO (Centrés en haut sans colonnes pour prendre toute la largeur)
+    mode = st.radio("Action", ["Connexion", "Inscription"], 
+                    index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                    horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     st.session_state.auth_mode = mode
     
     # 2. LOGO (Juste en dessous)
