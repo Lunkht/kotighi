@@ -518,10 +518,26 @@ def app():
                 st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
                 st.markdown("<div class='soc-header'>CIBLE(S) D'ANALYSE</div>", unsafe_allow_html=True)
                 
-                ips_input = st.text_area("Adresses IP (une par ligne)", height=100, 
-                                       placeholder="192.168.1.10\n10.0.0.5\n172.16.0.1",
-                                       help="Entrez plusieurs IPs pour une analyse en lot.")
+                # Gestion dynamique des champs d'IP
+                if "ip_count" not in st.session_state: st.session_state.ip_count = 1
                 
+                # Boutons +/- pour ajouter/retirer des champs
+                c_add, c_rem, _ = st.columns([1, 1, 4])
+                if c_add.button("➕ Ajouter IP", key="add_ip"): 
+                    st.session_state.ip_count += 1
+                    st.rerun()
+                if c_rem.button("➖ Retirer", key="rem_ip") and st.session_state.ip_count > 1: 
+                    st.session_state.ip_count -= 1
+                    st.rerun()
+                
+                ips_list = []
+                cols = st.columns(3) # Grille de 3 colonnes pour les inputs
+                for i in range(st.session_state.ip_count):
+                    with cols[i % 3]:
+                        val = st.text_input(f"IP Cible #{i+1}", key=f"ip_input_{i}", placeholder="192.168.x.x")
+                        if val: ips_list.append(val)
+                
+                st.markdown("---")
                 c1, c2, c3 = st.columns(3)
                 with c1: req = st.number_input("Req/min (Simulé)", 0, 10000, 150)
                 with c2: ports = st.number_input("Ports ouverts (Simulé)", 0, 1000, 5)
@@ -533,8 +549,8 @@ def app():
                 with col_add:
                     add_watch = st.button("AJOUTER À LA SURVEILLANCE", use_container_width=True)
                 
-                if go_scan and ips_input:
-                    ips = [ip.strip() for ip in ips_input.split('\n') if ip.strip()]
+                if go_scan and ips_list:
+                    ips = [ip.strip() for ip in ips_list if ip.strip()]
                     results = []
                     
                     progress_bar = st.progress(0)
@@ -575,8 +591,8 @@ def app():
                         
                     st.dataframe(df_res.style.applymap(highlight_status, subset=['Status']), use_container_width=True)
                 
-                if add_watch and ips_input:
-                    new_ips = [ip.strip() for ip in ips_input.split('\n') if ip.strip()]
+                if add_watch and ips_list:
+                    new_ips = [ip.strip() for ip in ips_list if ip.strip()]
                     for ip in new_ips:
                         if ip not in [w["ip"] for w in st.session_state.watchlist]:
                             st.session_state.watchlist.append({"ip": ip, "added_at": datetime.datetime.now().strftime("%H:%M"), "status": "PENDING"})
