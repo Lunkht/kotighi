@@ -63,6 +63,16 @@ for k,v in {"connecte":False,"utilisateur":None,"login_nom":None,"tentatives":0,
     if k not in st.session_state: st.session_state[k] = v
 
 # ── THEME CSS ────────────────────────────────────────────────────
+def get_logo_html(fill_color):
+    try:
+        with open("logo.svg", "r") as f:
+            svg = f.read()
+        # Injection couleur et style responsive
+        svg = svg.replace("<svg", f'<svg fill="{fill_color}" style="width:100%;height:auto;"')
+        return svg
+    except FileNotFoundError:
+        return ""
+
 def apply_theme():
     is_dark = st.session_state.theme == "Sombre"
     bg = "#0a0a0f" if is_dark else "#f8f9fa"
@@ -267,7 +277,8 @@ def page_login():
     # LOGO
     _, c_l, _ = st.columns([1, 0.8, 1])
     with c_l:
-        st.image("logo.svg", use_container_width=True)
+        logo_color = "#e8e8f0" if st.session_state.theme == "Sombre" else "#2c3e50"
+        st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
         
     st.markdown(f"""<div style='text-align:center;padding:0 0 10px'>
         <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{st.session_state.auth_mode.upper()}</div>
@@ -370,7 +381,8 @@ def app():
         # LOGO INTEGRATION
         c_logo, _ = st.columns([1, 0.1])
         with c_logo:
-            st.image("logo.svg", use_container_width=True)
+            logo_color = "#e8e8f0" if st.session_state.theme == "Sombre" else "#2c3e50"
+            st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
             
         st.markdown(f"""<div style='text-align:center;padding-bottom:16px'>
             <div style='font-family:Space Mono,monospace;font-size:.65rem;color:#666680;letter-spacing:2px;margin-top:4px'>V2.0 • ULTIMATE EDITION</div>
