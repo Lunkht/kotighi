@@ -264,8 +264,12 @@ def page_login():
                     horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     st.session_state.auth_mode = mode
     
-    st.markdown(f"""<div style='text-align:center;padding:20px 0 10px'>
-        <div style='font-family:Syne,sans-serif;font-size:2.5rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
+    # LOGO
+    _, c_l, _ = st.columns([1, 0.8, 1])
+    with c_l:
+        st.image("logo.svg", use_container_width=True)
+        
+    st.markdown(f"""<div style='text-align:center;padding:0 0 10px'>
         <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{st.session_state.auth_mode.upper()}</div>
     </div>""", unsafe_allow_html=True)
     
@@ -362,8 +366,13 @@ def app():
     with st.sidebar:
         st.session_state.theme = st.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
         apply_theme()
-        st.markdown(f"""<div style='text-align:center;padding:16px 0'>
-            <div style='font-family:Syne,sans-serif;font-size:1.8rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
+        
+        # LOGO INTEGRATION
+        c_logo, _ = st.columns([1, 0.1])
+        with c_logo:
+            st.image("logo.svg", use_container_width=True)
+            
+        st.markdown(f"""<div style='text-align:center;padding-bottom:16px'>
             <div style='font-family:Space Mono,monospace;font-size:.65rem;color:#666680;letter-spacing:2px;margin-top:4px'>V2.0 • ULTIMATE EDITION</div>
         </div>""", unsafe_allow_html=True)
         
@@ -664,30 +673,61 @@ def app():
         # --- THEME CLINIQUE FUTURISTE ---
         st.markdown("""
         <style>
-        /* Override spécifique pour la page Santé si le thème global est sombre */
+        /* Override spécifique pour la page Santé */
         [data-testid="stAppViewContainer"] {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
+        
+        /* Force Text Color Dark for Health Module */
+        .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown span, .stMarkdown div {
+            color: #2c3e50 !important;
+        }
+        .stSlider label, .stSelectbox label, .stNumberInput label {
+            color: #2c3e50 !important;
+        }
+        
+        /* Tabs Styling */
+        .stTabs [data-baseweb="tab-list"] {
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #636e72 !important;
+        }
+        .stTabs [data-baseweb="tab"][aria-selected="true"] {
+            background-color: white;
+            color: #00d2d3 !important;
+            font-weight: 800;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        /* Toggles Styling */
+        .stToggle label {
+            color: #2d3436 !important;
+            font-weight: 600;
+        }
+        
         .clinic-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
             padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-left: 6px solid #00d2d3;
         }
         .clinic-header {
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            color: #2c3e50;
+            color: #2c3e50 !important;
             margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-        .stToggle { margin-bottom: 10px; }
         .stButton>button {
             border-radius: 12px;
             font-weight: 700;
@@ -695,6 +735,9 @@ def app():
             letter-spacing: 1px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            background: linear-gradient(135deg, #00d2d3 0%, #00b894 100%) !important;
+            color: white !important;
+            border: none !important;
         }
         .stButton>button:hover {
             transform: translateY(-2px);
