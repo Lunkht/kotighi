@@ -620,9 +620,6 @@ def page_login():
 def app():
     # SIDEBAR
     with st.sidebar:
-        st.session_state.theme = st.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
-        apply_theme()
-        
         # LOGO
         c_logo, _ = st.columns([1, 0.1])
         with c_logo:
@@ -668,6 +665,14 @@ def app():
             """, unsafe_allow_html=True)
             
         with c2:
+            # SWITCH DE THÈME (Déplacé ici)
+            is_dark = st.toggle("🌙 Mode Sombre", value=(st.session_state.theme == "Sombre"))
+            new_theme = "Sombre" if is_dark else "Clair"
+            if new_theme != st.session_state.theme:
+                st.session_state.theme = new_theme
+                st.rerun()
+            apply_theme()
+            
             if lottie_scan:
                 st_lottie(lottie_scan, height=150, key="hero_anim_mini")
 
