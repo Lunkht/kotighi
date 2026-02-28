@@ -83,6 +83,8 @@ def apply_theme():
 
     .stApp {{
         background: {bg};
+        background-image: radial-gradient(circle at 10% 20%, rgba(124,108,255,0.05) 0%, transparent 20%),
+                          radial-gradient(circle at 90% 80%, rgba(0,245,196,0.05) 0%, transparent 20%);
         color: {text};
         animation: fadeInUp 0.5s ease-out;
     }}
@@ -91,82 +93,100 @@ def apply_theme():
         font-family: 'Inter', sans-serif;
     }}
     
+    /* SIDEBAR GLASSMORPHISM */
     [data-testid="stSidebar"] {{
         background: {card}!important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         border-right: 1px solid {border};
     }}
     
-    [data-testid="metric-container"] {{
-        background: {card};
+    /* CARDS GLASSMORPHISM */
+    [data-testid="metric-container"], .feature-card {{
+        background: {card}cc; /* Opacité légère */
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         border: 1px solid {border};
-        border-radius: 12px;
-        padding: 16px;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }}
-    [data-testid="metric-container"]:hover {{
-        transform: scale(1.02);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        border-color: {primary};
     }}
     
+    [data-testid="metric-container"]:hover, .feature-card:hover {{
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: {primary};
+        background: {card}ee;
+    }}
+    
+    /* INPUTS & WIDGETS */
+    .stTextInput input, .stNumberInput input, .stSelectbox select, .stSlider {{
+        background: {bg}88!important;
+        backdrop-filter: blur(4px);
+        color: {text}!important;
+        border: 1px solid {border}!important;
+        border-radius: 12px!important;
+        transition: all 0.3s ease;
+        padding: 10px 14px!important;
+    }}
+    .stTextInput input:focus, .stNumberInput input:focus, .stSelectbox select:focus {{
+        border-color: {primary}!important;
+        box-shadow: 0 0 0 2px {primary}33;
+    }}
+    
+    /* BUTTONS NEO-FUTURISTIC */
     .stButton>button {{
-        background: linear-gradient(135deg, rgba(0,245,196,.15), rgba(124,108,255,.15));
+        background: linear-gradient(135deg, rgba(0,245,196,.1), rgba(124,108,255,.1));
         color: {primary};
-        border: 1px solid rgba(0,245,196,.4);
-        border-radius: 10px;
+        border: 1px solid {primary}40;
+        border-radius: 12px;
         font-family: 'Syne', sans-serif;
         font-weight: 700;
-        width: 100%;
+        letter-spacing: 0.5px;
+        padding: 0.6rem 1.2rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-transform: uppercase;
-        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
     }}
     
     .stButton>button:hover {{
-        background: linear-gradient(135deg, rgba(0,245,196,.3), rgba(124,108,255,.3));
+        background: linear-gradient(135deg, {primary}20, {accent}20);
         border-color: {primary};
+        color: {text};
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,245,196,0.2);
+        box-shadow: 0 10px 20px -5px {primary}40;
     }}
     
     .stButton>button:active {{
         transform: translateY(0);
+        box-shadow: none;
     }}
     
-    h1, h2, h3, h4 {{
+    /* TYPOGRAPHY */
+    h1 {{
+        background: linear-gradient(90deg, {primary}, {accent});
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 3rem!important;
+        letter-spacing: -1px;
+        text-shadow: 0 10px 30px {primary}30;
+    }}
+    
+    h2, h3, h4 {{
         font-family: 'Syne', sans-serif!important;
         color: {text}!important;
+        letter-spacing: -0.5px;
     }}
     
-    .stTextInput input, .stNumberInput input, .stSelectbox select {{
-        background: {bg}!important;
-        color: {text}!important;
-        border: 1px solid {border}!important;
-        border-radius: 8px!important;
-        transition: border-color 0.3s;
-    }}
-    .stTextInput input:focus {{
-        border-color: {primary}!important;
-    }}
+    /* ALERTS & BADGES */
+    .adanger {{ background: rgba(255,71,87,.1); border-left: 4px solid #ff4757; border-radius: 8px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
+    .asuccess {{ background: rgba(0,245,196,.08); border-left: 4px solid #00f5c4; border-radius: 8px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
+    .awarning {{ background: rgba(255,165,0,.08); border-left: 4px solid #ffa502; border-radius: 8px; padding: 16px; color: #ffa502; font-family: 'Space+Mono', monospace; }}
+    .infob {{ background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.2); border-radius: 12px; padding: 14px 18px; color: #9d8fff; font-family: 'Space+Mono', monospace; font-size: .85rem; line-height: 1.6; }}
+    .ubadge {{ background: {bg}; border: 1px solid {primary}40; border-radius: 20px; padding: 6px 14px; font-family: 'Space+Mono', monospace; font-size: .75rem; color: {primary}; display: inline-block; margin-bottom: 8px; }}
     
-    .adanger {{ background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.4); border-radius: 10px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
-    .asuccess {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.3); border-radius: 10px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
-    .awarning {{ background: rgba(255,165,0,.08); border: 1px solid rgba(255,165,0,.3); border-radius: 10px; padding: 16px; color: #ffa502; font-family: 'Space+Mono', monospace; }}
-    .infob {{ background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.2); border-radius: 10px; padding: 12px 16px; color: #9d8fff; font-family: 'Space+Mono', monospace; font-size: .8rem; }}
-    .ubadge {{ background: rgba(0,245,196,.08); border: 1px solid rgba(0,245,196,.2); border-radius: 10px; padding: 10px 14px; font-family: 'Space+Mono', monospace; font-size: .78rem; color: #00f5c4; }}
-    
-    .feature-card {{
-        background: {card};
-        border: 1px solid {border};
-        border-radius: 16px;
-        padding: 24px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }}
-    .feature-card:hover {{
-        transform: translateY(-8px);
-        border-color: {primary};
-        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-    }}
     </style>""", unsafe_allow_html=True)
 
 apply_theme()
@@ -336,49 +356,100 @@ def page_login():
 
         st.markdown("<div style='margin-top:20px;font-family:Space Mono,monospace;font-size:.72rem;color:#444460;text-align:center'>Comptes demo :<br>admin / kotighi2024 &nbsp;|&nbsp; analyste / analyse123 &nbsp;|&nbsp; medecin / sante456</div>", unsafe_allow_html=True)
 
-# ── APP PRINCIPALE ────────────────────────────────────────────────
+# ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
-    user  = st.session_state.utilisateur
-    login = st.session_state.login_nom
-
+    # SIDEBAR
     with st.sidebar:
         st.session_state.theme = st.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
         apply_theme()
         st.markdown(f"""<div style='text-align:center;padding:16px 0'>
-            <div style='font-family:Syne,sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
+            <div style='font-family:Syne,sans-serif;font-size:1.8rem;font-weight:800;background:linear-gradient(90deg,#00f5c4,#7c6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>KOTIGHI AI</div>
+            <div style='font-family:Space Mono,monospace;font-size:.65rem;color:#666680;letter-spacing:2px;margin-top:4px'>V2.0 • ULTIMATE EDITION</div>
+        </div>""", unsafe_allow_html=True)
+        
+        # User Profile Card in Sidebar
+        user = st.session_state.utilisateur
+        st.markdown(f"""
+        <div style='background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)'>
+            <div style='font-size:0.8rem;color:#888'>Connecté en tant que</div>
+            <div style='font-weight:bold;color:#fff;font-size:0.95rem'>👤 {user['nom']}</div>
+            <div style='font-size:0.75rem;color:#00f5c4;margin-top:4px;text-transform:uppercase;letter-spacing:1px'>{user['role']}</div>
         </div>
-        <div class='ubadge'>Connecte : <strong>{login}</strong><br>Role : {user["role"]}</div>""", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("### Navigation")
-        page = st.radio("", user["acces"], label_visibility="collapsed")
-        st.divider()
-        st.markdown("<div class='infob'>Prototype educatif.</div>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("SE DECONNECTER"):
-            st.session_state.connecte=False; st.session_state.utilisateur=None
-            st.session_state.login_nom=None; st.rerun()
-        st.markdown("<div style='font-family:Space Mono,monospace;font-size:.7rem;color:#444460;text-align:center;margin-top:12px'>v1.1 — Python et Streamlit</div>", unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+
+        pages = [p for p in user["acces"] if p in ["Accueil", "Cybersecurite", "Sante", "Dashboard", "Gestion"]]
+        page = st.radio("Navigation", pages, label_visibility="collapsed")
+        
+        st.markdown("---")
+        if st.button("Se déconnecter"):
+            st.session_state.connecte = False
+            st.rerun()
 
     # ACCUEIL
     if page == "Accueil":
-        st.markdown(f"""<div style='padding:30px 0 10px'>
-            <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:2px'>Bienvenue,</div>
-            <h1 style='font-size:2.2rem;font-weight:800;margin:4px 0;background:linear-gradient(90deg,#00f5c4,#7c6cff,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>{user["nom"]}</h1>
-            <div style='font-family:Space Mono,monospace;font-size:.8rem;color:#666680'>Role : {user["role"]} | Acces : {len(user["acces"])} module(s)</div>
-        </div>""", unsafe_allow_html=True)
-        st.divider()
-        c1,c2 = st.columns(2)
-        if "Cybersecurite" in user["acces"]:
-            with c1: st.markdown("<div class='feature-card'><div style='font-size:1.1rem;font-weight:700;color:#00f5c4;margin-bottom:8px'>Module Cybersecurite</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Detection d&#39;intrusions, DDoS, scans de ports et brute force.</div></div>", unsafe_allow_html=True)
-        if "Sante" in user["acces"]:
-            with c2: st.markdown("<div class='feature-card'><div style='font-size:1.1rem;font-weight:700;color:#ff6b6b;margin-bottom:8px'>Module Sante</div><div style='color:#888;font-size:.88rem;line-height:1.7'>Analyse des symptomes et prediction parmi 6 pathologies.</div></div>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        c1,c2,c3,c4 = st.columns(4)
-        with c1: st.metric("Precision cyber","98%+","NSL-KDD reel")
-        with c2: st.metric("Precision sante","95%+","donnees reelles")
-        with c3: st.metric("Types attaques","5","DoS,Probe,R2L...")
-        with c4: st.metric("Symptomes","10","par module sante")
+        # HERO SECTION
+        c1, c2 = st.columns([1.5, 1])
+        with c1:
+            st.markdown(f"""
+            <div style='margin-top: 20px;'>
+                <div class='ubadge'>INTELLIGENCE ARTIFICIELLE HYBRIDE</div>
+                <h1>Sécurisez vos réseaux.<br>Protégez votre santé.</h1>
+                <p style='font-size: 1.1rem; color: #888; line-height: 1.6; margin-bottom: 30px;'>
+                    KOTIGHI AI combine la puissance de l'apprentissage automatique pour détecter les intrusions réseaux 
+                    en temps réel et fournir des pré-diagnostics médicaux de haute précision.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            hc1, hc2 = st.columns(2)
+            with hc1:
+                st.markdown(f"""
+                <div class='feature-card'>
+                    <div style='font-size:1.5rem;margin-bottom:10px'>🛡️</div>
+                    <div style='font-weight:700;color:#00f5c4;margin-bottom:8px'>Cyber-Défense</div>
+                    <div style='font-size:0.85rem;color:#888'>Détection d'attaques DDoS, scans et intrusions avec 99% de précision.</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with hc2:
+                st.markdown(f"""
+                <div class='feature-card'>
+                    <div style='font-size:1.5rem;margin-bottom:10px'>🩺</div>
+                    <div style='font-weight:700;color:#ff6b6b;margin-bottom:8px'>Santé Connectée</div>
+                    <div style='font-size:0.85rem;color:#888'>Analyse de symptômes et conseils de prévention personnalisés.</div>
+                </div>
+                """, unsafe_allow_html=True)
 
+        with c2:
+            st_lottie(lottie_scan, height=400, key="hero_anim")
+
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("### 🚀 Modules disponibles")
+        
+        m1, m2 = st.columns(2)
+        if "Cybersecurite" in user["acces"]:
+            with m1:
+                st.markdown("""
+                <div class='feature-card' style='height:100%'>
+                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:15px'>
+                        <span style='font-size:1.2rem;font-weight:800;color:#00f5c4'>MODULE CYBER</span>
+                        <span style='background:rgba(0,245,196,0.1);color:#00f5c4;padding:4px 8px;border-radius:4px;font-size:0.7rem'>v2.4</span>
+                    </div>
+                    <p style='color:#888;font-size:0.9rem;margin-bottom:20px'>Console d'analyse de trafic réseau en temps réel avec détection d'anomalies par Random Forest.</p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        if "Sante" in user["acces"]:
+            with m2:
+                st.markdown("""
+                <div class='feature-card' style='height:100%'>
+                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:15px'>
+                        <span style='font-size:1.2rem;font-weight:800;color:#ff6b6b'>MODULE SANTÉ</span>
+                        <span style='background:rgba(255,107,107,0.1);color:#ff6b6b;padding:4px 8px;border-radius:4px;font-size:0.7rem'>v3.1</span>
+                    </div>
+                    <p style='color:#888;font-size:0.9rem;margin-bottom:20px'>Assistant de diagnostic médical intelligent avec explication des symptômes et conseils.</p>
+                </div>
+                """, unsafe_allow_html=True)
+    
     # CYBERSECURITE
     elif page == "Cybersecurite":
         st.markdown("## Detection d'intrusion reseau"); st.divider()
