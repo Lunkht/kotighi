@@ -105,9 +105,6 @@ def apply_theme():
     /* ═══ BASE ═══ */
     .stApp {{
         background: {bg} !important;
-        background-image:
-            radial-gradient(ellipse 80% 60% at 5% 10%, {accent}08 0%, transparent 60%),
-            radial-gradient(ellipse 60% 50% at 95% 90%, {primary}06 0%, transparent 50%);
         color: {text};
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
@@ -187,8 +184,8 @@ def apply_theme():
 
     /* ═══ BUTTONS ═══ */
     .stButton > button {{
-        background: linear-gradient(135deg, {primary}, {accent}) !important;
-        color: #FFFFFF !important;
+        background: {primary} !important;
+        color: #000000 !important;
         border: none !important;
         border-radius: 10px;
         font-family: 'Inter', sans-serif;
@@ -198,16 +195,6 @@ def apply_theme():
         padding: .65rem 1.5rem;
         transition: all .3s cubic-bezier(.4,0,.2,1);
         text-transform: uppercase;
-        position: relative;
-        overflow: hidden;
-    }}
-    .stButton > button::before {{
-        content: '';
-        position: absolute;
-        top: 0; left: -100%;
-        width: 200%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
-        animation: shimmer 3s infinite;
     }}
     .stButton > button:hover {{
         transform: translateY(-2px);
@@ -221,9 +208,7 @@ def apply_theme():
 
     /* ═══ TYPOGRAPHY ═══ */
     h1 {{
-        background: linear-gradient(135deg, {primary}, {accent});
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: {text} !important;
         font-family: 'Inter', sans-serif !important;
         font-weight: 800 !important;
         font-size: 2.2rem !important;
@@ -261,7 +246,7 @@ def apply_theme():
         letter-spacing: .5px;
     }}
     .stTabs [data-baseweb="tab"][aria-selected="true"] {{
-        background: linear-gradient(135deg, {primary}15, {accent}10) !important;
+        background: {primary}15 !important;
         color: {primary} !important;
         font-weight: 700;
         box-shadow: 0 2px 8px rgba(0,0,0,.15);
@@ -282,7 +267,7 @@ def apply_theme():
 
     /* ═══ PROGRESS BARS ═══ */
     .stProgress > div > div {{
-        background: linear-gradient(90deg, {primary}, {accent}) !important;
+        background: {primary} !important;
         border-radius: 8px;
     }}
 
@@ -425,7 +410,7 @@ def apply_theme():
     }}
     /* USER PROFILE CARD */
     .k-profile {{
-        background: linear-gradient(135deg, {primary}08, {accent}06);
+        background: {card};
         border: 1px solid {border};
         border-radius: 14px;
         padding: 16px;
