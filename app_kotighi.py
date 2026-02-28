@@ -269,6 +269,13 @@ def get_sante():
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
+    # CSS pour centrer les boutons radio
+    st.markdown("""<style>
+    div[role="radiogroup"] {
+        justify-content: center;
+    }
+    </style>""", unsafe_allow_html=True)
+
     mode = st.radio("Action", ["Connexion", "Inscription"], 
                     index=0 if st.session_state.auth_mode == "Connexion" else 1,
                     horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
@@ -300,45 +307,14 @@ def page_login():
             if st.button("SE CONNECTER", type="primary"):
                 user = verifier(login, password)
                 if user:
-                    if user["role"] in ["Administrateur", "Analyste Cyber"]:
-                        st.session_state.auth_2fa_pending = True
-                        st.session_state.auth_user_temp = user
-                        st.session_state.auth_login_temp = login.lower()
-                        st.rerun()
-                    else:
-                        st.session_state.connecte = True
-                        st.session_state.utilisateur = user
-                        st.session_state.login_nom = login.lower()
-                        st.session_state.tentatives = 0
-                        st.success("Connexion reussie."); time.sleep(0.8); st.rerun()
+                    st.session_state.connecte = True
+                    st.session_state.utilisateur = user
+                    st.session_state.login_nom = login.lower()
+                    st.session_state.tentatives = 0
+                    st.success("Connexion reussie."); time.sleep(0.8); st.rerun()
                 else:
                     st.session_state.tentatives += 1
                     st.markdown("<div class='adanger'>Identifiant ou mot de passe incorrect.</div>", unsafe_allow_html=True)
-        
-        elif st.session_state.get("auth_2fa_pending", False):
-            st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>🔐 Vérification 2FA</div>
-                <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Code envoyé à votre terminal sécurisé</div>
-            </div>""", unsafe_allow_html=True)
-            
-            code = st.text_input("Code de sécurité (Simulation: 123456)", max_chars=6, type="password")
-            
-            c1, c2 = st.columns(2)
-            with c1:
-                if st.button("Valider Code", type="primary"):
-                    if code == "123456":
-                        st.session_state.connecte = True
-                        st.session_state.utilisateur = st.session_state.auth_user_temp
-                        st.session_state.login_nom = st.session_state.auth_login_temp
-                        st.session_state.tentatives = 0
-                        del st.session_state.auth_2fa_pending
-                        st.success("Authentification forte réussie."); time.sleep(0.8); st.rerun()
-                    else:
-                        st.error("Code incorrect.")
-            with c2:
-                if st.button("Annuler"):
-                    del st.session_state.auth_2fa_pending
-                    st.rerun()
         
         else:
             st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
