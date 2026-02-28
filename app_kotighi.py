@@ -536,19 +536,17 @@ def page_login():
     }
     </style>""", unsafe_allow_html=True)
 
-    # 1. BOUTONS RADIO (Centrés via Colonnes + CSS)
-    _, c_mid, _ = st.columns([1, 1, 1])
-    with c_mid:
-        mode = st.radio("Action", ["Connexion", "Inscription"], 
-                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+    # 1. BOUTONS RADIO (Centrés en haut sans colonnes pour prendre toute la largeur)
+    mode = st.radio("Action", ["Connexion", "Inscription"], 
+                    index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                    horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     st.session_state.auth_mode = mode
     
     # 2. LOGO (Juste en dessous)
-    _, c_l, _ = st.columns([1, 0.8, 1])
-    with c_l:
-        logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
-        st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
+    # _, c_l, _ = st.columns([1, 0.8, 1])
+    # with c_l:
+    #     logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
+    #     st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
         
     st.markdown(f"""<div style='text-align:center;padding:0 0 16px'>
         <div class='k-badge' style='margin:8px auto;display:inline-flex'>{st.session_state.auth_mode.upper()}</div>
@@ -647,6 +645,19 @@ def app():
         page = st.radio("Navigation", pages, label_visibility="collapsed")
         
         st.markdown("---")
+        
+        # SWITCH DE THÈME (Dans la Sidebar, en bas)
+        st.markdown("<div class='k-label' style='margin-bottom:8px'>APPARENCE</div>", unsafe_allow_html=True)
+        theme_choice = st.radio("Thème", ["Sombre", "Clair"], 
+                              index=0 if st.session_state.theme == "Sombre" else 1,
+                              horizontal=True, label_visibility="collapsed", key="theme_sidebar")
+        
+        if theme_choice != st.session_state.theme:
+            st.session_state.theme = theme_choice
+            st.rerun()
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
         if st.button("🚪 Se déconnecter", use_container_width=True):
             st.session_state.connecte = False
             st.rerun()
@@ -668,15 +679,6 @@ def app():
             """, unsafe_allow_html=True)
             
         with c2:
-            # SWITCH DE THÈME (Radio horizontal)
-            theme_choice = st.radio("Thème d'interface", ["Sombre", "Clair"], 
-                                  index=0 if st.session_state.theme == "Sombre" else 1,
-                                  horizontal=True, label_visibility="collapsed")
-            
-            if theme_choice != st.session_state.theme:
-                st.session_state.theme = theme_choice
-                st.rerun()
-            
             if lottie_scan:
                 st_lottie(lottie_scan, height=150, key="hero_anim_mini")
 
