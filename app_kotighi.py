@@ -517,15 +517,20 @@ def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
     st.markdown("""<style>
-    div[role="radiogroup"] { justify-content: center; }
+    div[role="radiogroup"] { 
+        justify-content: center !important;
+        margin-bottom: 25px;
+        transform: scale(1.1);
+    }
     </style>""", unsafe_allow_html=True)
 
+    # 1. BOUTONS RADIO (Centrés en haut)
     mode = st.radio("Action", ["Connexion", "Inscription"], 
                     index=0 if st.session_state.auth_mode == "Connexion" else 1,
                     horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     st.session_state.auth_mode = mode
     
-    # LOGO
+    # 2. LOGO (Juste en dessous)
     _, c_l, _ = st.columns([1, 0.8, 1])
     with c_l:
         logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
