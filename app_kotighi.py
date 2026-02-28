@@ -727,7 +727,9 @@ def app():
             if "Cybersecurite" in user["acces"]:
                 st.markdown("""
                 <div class='feature-card' style='margin-bottom:12px'>
-                    <div style='font-size:1.5rem;margin-bottom:8px'>🛡️</div>
+                    <div style='margin-bottom:8px'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
                     <div style='font-weight:700;color:#00E5FF;margin-bottom:4px;font-size:.95rem'>Module Cyber</div>
                     <div class='k-subtext' style='font-size:.8rem'>Lancer un scan réseau</div>
                 </div>
@@ -736,7 +738,9 @@ def app():
             if "Sante" in user["acces"]:
                 st.markdown("""
                 <div class='feature-card'>
-                    <div style='font-size:1.5rem;margin-bottom:8px'>🩺</div>
+                    <div style='margin-bottom:8px'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
                     <div style='font-weight:700;color:#8B5CF6;margin-bottom:4px;font-size:.95rem'>Module Santé</div>
                     <div class='k-subtext' style='font-size:.8rem'>Nouveau diagnostic</div>
                 </div>
@@ -1051,9 +1055,15 @@ def app():
                             st.warning("Service PDF indisponible momentanément.")
             
             else:
+                # Placeholder state (SVG Icon instead of Emoji)
                 st.markdown("""
                 <div class='k-card' style='text-align:center;padding:60px 30px'>
-                    <div style='font-size:4rem;opacity:.4;margin-bottom:16px'>🏥</div>
+                    <div style='margin-bottom:16px; opacity:0.6'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            <path d="M12 5 9.04 11l6.22-2.22a.56.56 0 0 1 .63.95l-5.63 3.4L15 18"/>
+                        </svg>
+                    </div>
                     <p style='font-size:1.1rem;font-weight:600;margin-bottom:6px'>En attente de données...</p>
                     <p class='k-subtext' style='font-size:.85rem'>Veuillez remplir le formulaire à gauche.</p>
                 </div>
