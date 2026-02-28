@@ -705,8 +705,8 @@ def app():
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 height=320, margin=dict(t=20, b=30, l=40, r=20),
                 legend=dict(orientation="h", y=1.12, font=dict(family="JetBrains Mono", size=11)),
-                xaxis=dict(showgrid=False, color="#64748B", title=""),
-                yaxis=dict(showgrid=True, gridcolor="#1C1F2E20", color="#64748B", title=""),
+                xaxis=dict(showgrid=False, color="#64748B", title=None),
+                yaxis=dict(showgrid=True, gridcolor="rgba(28, 31, 46, 0.12)", color="#64748B", title=None),
                 font=dict(family="Inter", color="#64748B")
             )
             st.plotly_chart(fig_line, use_container_width=True)
