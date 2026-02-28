@@ -21,7 +21,10 @@ from cryptography.fernet import Fernet
 
 # Configuration de la base de données (à adapter avec tes identifiants)
 # Format : postgresql://utilisateur:motdepasse@hote:port/nom_bdd
-DB_URL = st.secrets.get("postgres", {}).get("url", "postgresql://user:pass@localhost:5432/kotighi_db")
+try:
+    DB_URL = st.secrets.get("postgres", {}).get("url", "postgresql://user:pass@localhost:5432/kotighi_db")
+except Exception:
+    DB_URL = "postgresql://user:pass@localhost:5432/kotighi_db"
 
 def init_db():
     try:
@@ -75,128 +78,387 @@ def get_logo_html(fill_color):
 
 def apply_theme():
     is_dark = st.session_state.theme == "Sombre"
-    bg = "#0a0a0f" if is_dark else "#f8f9fa"
-    text = "#e8e8f0" if is_dark else "#212529"
-    card = "#111118" if is_dark else "#ffffff"
-    border = "#1e1e2e" if is_dark else "#dee2e6"
-    subtext = "#666680" if is_dark else "#6c757d"
-    primary = "#00f5c4"
-    accent = "#7c6cff"
+    # — Premium Color Palette —
+    bg       = "#06070A" if is_dark else "#F1F5F9"
+    bg2      = "#0D0E14" if is_dark else "#E2E8F0"
+    text     = "#E2E8F0" if is_dark else "#1E293B"
+    card     = "#0F1117" if is_dark else "#FFFFFF"
+    border   = "#1C1F2E" if is_dark else "#CBD5E1"
+    subtext  = "#64748B"
+    primary  = "#00E5FF"
+    accent   = "#8B5CF6"
+    danger   = "#EF4444"
+    warning  = "#F59E0B"
+    success  = "#10B981"
+    sidebar_bg = "#0A0B10" if is_dark else "#F8FAFC"
 
     st.markdown(f"""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&family=Space+Mono&display=swap');
-    
-    @keyframes fadeInUp {{
-        from {{ opacity: 0; transform: translateY(20px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    /* ═══ KEYFRAMES ═══ */
+    @keyframes fadeIn {{ from {{ opacity:0; transform:translateY(12px); }} to {{ opacity:1; transform:translateY(0); }} }}
+    @keyframes slideInLeft {{ from {{ opacity:0; transform:translateX(-20px); }} to {{ opacity:1; transform:translateX(0); }} }}
+    @keyframes pulseGlow {{ 0%,100% {{ box-shadow:0 0 8px {primary}30; }} 50% {{ box-shadow:0 0 20px {primary}50; }} }}
+    @keyframes shimmer {{ 0% {{ background-position:-200% 0; }} 100% {{ background-position:200% 0; }} }}
+    @keyframes blink {{ 50% {{ opacity:.4; }} }}
+
+    /* ═══ BASE ═══ */
+    .stApp {{
+        background: {bg} !important;
+        background-image:
+            radial-gradient(ellipse 80% 60% at 5% 10%, {accent}08 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 95% 90%, {primary}06 0%, transparent 50%);
+        color: {text};
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }}
+    html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
+    .block-container {{ max-width: 1400px !important; padding-top: 2rem; }}
+
+    /* ═══ SCROLLBAR ═══ */
+    ::-webkit-scrollbar {{ width: 6px; height: 6px; }}
+    ::-webkit-scrollbar-track {{ background: transparent; }}
+    ::-webkit-scrollbar-thumb {{ background: {border}; border-radius: 10px; }}
+    ::-webkit-scrollbar-thumb:hover {{ background: {primary}60; }}
+
+    /* ═══ SIDEBAR ═══ */
+    [data-testid="stSidebar"] {{
+        background: {sidebar_bg} !important;
+        border-right: 1px solid {border} !important;
+    }}
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {{
+        animation: slideInLeft .4s ease-out;
     }}
 
-    .stApp {{
-        background: {bg};
-        background-image: radial-gradient(circle at 10% 20%, rgba(124,108,255,0.05) 0%, transparent 20%),
-                          radial-gradient(circle at 90% 80%, rgba(0,245,196,0.05) 0%, transparent 20%);
-        color: {text};
-        animation: fadeInUp 0.5s ease-out;
-    }}
-    
-    html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif;
-    }}
-    
-    /* SIDEBAR GLASSMORPHISM */
-    [data-testid="stSidebar"] {{
-        background: {card}!important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-right: 1px solid {border};
-    }}
-    
-    /* CARDS GLASSMORPHISM */
-    [data-testid="metric-container"], .feature-card {{
-        background: {card}cc; /* Opacité légère */
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+    /* ═══ METRIC CARDS ═══ */
+    [data-testid="metric-container"] {{
+        background: {card} !important;
         border: 1px solid {border};
         border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 20px 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        animation: fadeIn .5s ease-out;
     }}
-    
-    [data-testid="metric-container"]:hover, .feature-card:hover {{
-        transform: translateY(-5px) scale(1.01);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border-color: {primary};
-        background: {card}ee;
+    [data-testid="metric-container"]:hover {{
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,.2), 0 0 0 1px {primary}20;
+        border-color: {primary}40;
     }}
-    
-    /* INPUTS & WIDGETS */
-    .stTextInput input, .stNumberInput input, .stSelectbox select, .stSlider {{
-        background: {bg}88!important;
-        backdrop-filter: blur(4px);
-        color: {text}!important;
-        border: 1px solid {border}!important;
-        border-radius: 12px!important;
-        transition: all 0.3s ease;
-        padding: 10px 14px!important;
+    [data-testid="metric-container"] [data-testid="stMetricLabel"] {{
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: {subtext} !important;
     }}
-    .stTextInput input:focus, .stNumberInput input:focus, .stSelectbox select:focus {{
-        border-color: {primary}!important;
-        box-shadow: 0 0 0 2px {primary}33;
-    }}
-    
-    /* BUTTONS NEO-FUTURISTIC */
-    .stButton>button {{
-        background: linear-gradient(135deg, rgba(0,245,196,.1), rgba(124,108,255,.1));
-        color: {primary};
-        border: 1px solid {primary}40;
-        border-radius: 12px;
-        font-family: 'Syne', sans-serif;
+    [data-testid="metric-container"] [data-testid="stMetricValue"] {{
+        font-family: 'JetBrains Mono', monospace;
         font-weight: 700;
-        letter-spacing: 0.5px;
-        padding: 0.6rem 1.2rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1.6rem !important;
+        color: {text} !important;
+    }}
+    [data-testid="metric-container"] [data-testid="stMetricDelta"] {{
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .75rem;
+    }}
+
+    /* ═══ INPUTS ═══ */
+    .stTextInput input, .stNumberInput input, .stTextArea textarea {{
+        background: {bg2} !important;
+        color: {text} !important;
+        border: 1px solid {border} !important;
+        border-radius: 10px !important;
+        padding: 12px 16px !important;
+        font-family: 'Inter', sans-serif;
+        font-size: .9rem;
+        transition: all .25s ease;
+    }}
+    .stTextInput input:focus, .stNumberInput input:focus, .stTextArea textarea:focus {{
+        border-color: {primary} !important;
+        box-shadow: 0 0 0 3px {primary}15 !important;
+        outline: none !important;
+    }}
+    .stSelectbox > div > div {{
+        background: {bg2} !important;
+        border: 1px solid {border} !important;
+        border-radius: 10px !important;
+    }}
+
+    /* ═══ BUTTONS ═══ */
+    .stButton > button {{
+        background: linear-gradient(135deg, {primary}, {accent}) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: .85rem;
+        letter-spacing: .5px;
+        padding: .65rem 1.5rem;
+        transition: all .3s cubic-bezier(.4,0,.2,1);
         text-transform: uppercase;
         position: relative;
         overflow: hidden;
     }}
-    
-    .stButton>button:hover {{
-        background: linear-gradient(135deg, {primary}20, {accent}20);
-        border-color: {primary};
-        color: {text};
+    .stButton > button::before {{
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 200%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+        animation: shimmer 3s infinite;
+    }}
+    .stButton > button:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px {primary}40;
+        box-shadow: 0 8px 25px {primary}35;
+        filter: brightness(1.1);
     }}
-    
-    .stButton>button:active {{
+    .stButton > button:active {{
         transform: translateY(0);
-        box-shadow: none;
+        box-shadow: 0 2px 8px {primary}20;
     }}
-    
-    /* TYPOGRAPHY */
+
+    /* ═══ TYPOGRAPHY ═══ */
     h1 {{
-        background: linear-gradient(90deg, {primary}, {accent});
+        background: linear-gradient(135deg, {primary}, {accent});
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3rem!important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 800 !important;
+        font-size: 2.2rem !important;
         letter-spacing: -1px;
-        text-shadow: 0 10px 30px {primary}30;
     }}
-    
-    h2, h3, h4 {{
-        font-family: 'Syne', sans-serif!important;
-        color: {text}!important;
-        letter-spacing: -0.5px;
+    h2 {{
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+        color: {text} !important;
+        font-size: 1.4rem !important;
+        letter-spacing: -.5px;
     }}
-    
-    /* ALERTS & BADGES */
-    .adanger {{ background: rgba(255,71,87,.1); border-left: 4px solid #ff4757; border-radius: 8px; padding: 16px; color: #ff4757; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
-    .asuccess {{ background: rgba(0,245,196,.08); border-left: 4px solid #00f5c4; border-radius: 8px; padding: 16px; color: #00f5c4; font-family: 'Space+Mono', monospace; animation: fadeInUp 0.4s ease-out; }}
-    .awarning {{ background: rgba(255,165,0,.08); border-left: 4px solid #ffa502; border-radius: 8px; padding: 16px; color: #ffa502; font-family: 'Space+Mono', monospace; }}
-    .infob {{ background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.2); border-radius: 12px; padding: 14px 18px; color: #9d8fff; font-family: 'Space+Mono', monospace; font-size: .85rem; line-height: 1.6; }}
-    .ubadge {{ background: {bg}; border: 1px solid {primary}40; border-radius: 20px; padding: 6px 14px; font-family: 'Space+Mono', monospace; font-size: .75rem; color: {primary}; display: inline-block; margin-bottom: 8px; }}
-    
+    h3, h4 {{
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 600 !important;
+        color: {text} !important;
+    }}
+
+    /* ═══ TABS ═══ */
+    .stTabs [data-baseweb="tab-list"] {{
+        background: {card};
+        border-radius: 12px;
+        padding: 4px;
+        border: 1px solid {border};
+        gap: 4px;
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        color: {subtext} !important;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .78rem;
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 8px 16px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }}
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {{
+        background: linear-gradient(135deg, {primary}15, {accent}10) !important;
+        color: {primary} !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }}
+    .stTabs [data-baseweb="tab-highlight"] {{
+        background-color: transparent !important;
+    }}
+
+    /* ═══ DATAFRAMES ═══ */
+    [data-testid="stDataFrame"] {{
+        border: 1px solid {border};
+        border-radius: 12px;
+        overflow: hidden;
+    }}
+
+    /* ═══ DIVIDER ═══ */
+    hr {{ border-color: {border} !important; opacity: .5; }}
+
+    /* ═══ PROGRESS BARS ═══ */
+    .stProgress > div > div {{
+        background: linear-gradient(90deg, {primary}, {accent}) !important;
+        border-radius: 8px;
+    }}
+
+    /* ═══ CUSTOM COMPONENTS ═══ */
+    .k-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: {primary}10;
+        border: 1px solid {primary}30;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .7rem;
+        font-weight: 600;
+        color: {primary};
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }}
+    .k-card {{
+        background: {card};
+        border: 1px solid {border};
+        border-radius: 16px;
+        padding: 24px;
+        transition: all .3s ease;
+        animation: fadeIn .5s ease-out;
+    }}
+    .k-card:hover {{
+        border-color: {primary}30;
+        box-shadow: 0 8px 30px rgba(0,0,0,.15);
+    }}
+    .k-card-accent {{
+        background: {card};
+        border: 1px solid {border};
+        border-left: 3px solid {primary};
+        border-radius: 12px;
+        padding: 20px 24px;
+        transition: all .3s ease;
+    }}
+    .k-card-accent:hover {{
+        border-left-color: {accent};
+        box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }}
+    .k-alert-danger {{
+        background: {danger}08;
+        border: 1px solid {danger}25;
+        border-left: 3px solid {danger};
+        border-radius: 10px;
+        padding: 14px 18px;
+        color: {danger};
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .85rem;
+        animation: fadeIn .4s ease-out;
+    }}
+    .k-alert-success {{
+        background: {success}08;
+        border: 1px solid {success}25;
+        border-left: 3px solid {success};
+        border-radius: 10px;
+        padding: 14px 18px;
+        color: {success};
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .85rem;
+        animation: fadeIn .4s ease-out;
+    }}
+    .k-alert-warning {{
+        background: {warning}08;
+        border: 1px solid {warning}25;
+        border-left: 3px solid {warning};
+        border-radius: 10px;
+        padding: 14px 18px;
+        color: {warning};
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .85rem;
+    }}
+    .k-info {{
+        background: {accent}08;
+        border: 1px solid {accent}20;
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: {accent};
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .82rem;
+        line-height: 1.7;
+    }}
+    .k-mono {{ font-family: 'JetBrains Mono', monospace; }}
+    .k-subtext {{ color: {subtext}; font-size: .85rem; }}
+    .k-label {{
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: {subtext};
+        margin-bottom: 4px;
+    }}
+    /* SOC TERMINAL STYLES */
+    .soc-panel {{
+        background: {card};
+        border: 1px solid {border};
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        animation: fadeIn .5s ease-out;
+    }}
+    .soc-header {{
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: {subtext};
+        border-bottom: 1px solid {border};
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+    }}
+    .status-dot {{
+        height: 8px; width: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }}
+    .dot-green {{ background: {success}; box-shadow: 0 0 8px {success}80; }}
+    .dot-red {{ background: {danger}; box-shadow: 0 0 8px {danger}80; animation: blink 1.2s ease-in-out infinite; }}
+    .dot-yellow {{ background: {warning}; box-shadow: 0 0 8px {warning}60; }}
+    /* CLINIC STYLES */
+    .clinic-card {{
+        background: {card};
+        border: 1px solid {border};
+        border-left: 3px solid {primary};
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 16px;
+        transition: all .3s ease;
+        animation: fadeIn .5s ease-out;
+    }}
+    .clinic-card:hover {{
+        box-shadow: 0 6px 24px rgba(0,0,0,.15);
+        border-left-color: {accent};
+    }}
+    /* USER PROFILE CARD */
+    .k-profile {{
+        background: linear-gradient(135deg, {primary}08, {accent}06);
+        border: 1px solid {border};
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }}
+    .k-profile-name {{
+        font-weight: 700;
+        color: {text};
+        font-size: .95rem;
+        margin-bottom: 2px;
+    }}
+    .k-profile-role {{
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .7rem;
+        font-weight: 600;
+        color: {primary};
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }}
+    /* FEATURE CARDS */
+    .feature-card {{
+        background: {card};
+        border: 1px solid {border};
+        border-radius: 14px;
+        padding: 20px;
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        cursor: pointer;
+    }}
+    .feature-card:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0,0,0,.18);
+        border-color: {primary}40;
+    }}
     </style>""", unsafe_allow_html=True)
 
 apply_theme()
@@ -269,11 +531,8 @@ def get_sante():
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
-    # CSS pour centrer les boutons radio
     st.markdown("""<style>
-    div[role="radiogroup"] {
-        justify-content: center;
-    }
+    div[role="radiogroup"] { justify-content: center; }
     </style>""", unsafe_allow_html=True)
 
     mode = st.radio("Action", ["Connexion", "Inscription"], 
@@ -284,68 +543,74 @@ def page_login():
     # LOGO
     _, c_l, _ = st.columns([1, 0.8, 1])
     with c_l:
-        logo_color = "#e8e8f0" if st.session_state.theme == "Sombre" else "#2c3e50"
+        logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
         st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
         
-    st.markdown(f"""<div style='text-align:center;padding:0 0 10px'>
-        <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;letter-spacing:3px;margin-top:6px'>{st.session_state.auth_mode.upper()}</div>
+    st.markdown(f"""<div style='text-align:center;padding:0 0 16px'>
+        <div class='k-badge' style='margin:8px auto;display:inline-flex'>{st.session_state.auth_mode.upper()}</div>
     </div>""", unsafe_allow_html=True)
     
     _,col,_ = st.columns([1,1.2,1])
     with col:
         if st.session_state.auth_mode == "Connexion":
-            st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
-                <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Identifiez-vous pour acceder a la plateforme</div>
+            st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
+                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>🔐 Connexion</div>
+                <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Identifiez-vous pour accéder à la plateforme</div>
             </div>""", unsafe_allow_html=True)
             if st.session_state.tentatives >= 5:
-                st.markdown("<div class='adanger'>Trop de tentatives. Compte bloque.</div>", unsafe_allow_html=True)
+                st.markdown("<div class='k-alert-danger'>⛔ Trop de tentatives. Compte bloqué.</div>", unsafe_allow_html=True)
                 return
             login    = st.text_input("Identifiant", placeholder="Votre login")
             password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
             
-            if st.button("SE CONNECTER", type="primary"):
+            if st.button("SE CONNECTER", type="primary", use_container_width=True):
                 user = verifier(login, password)
                 if user:
                     st.session_state.connecte = True
                     st.session_state.utilisateur = user
                     st.session_state.login_nom = login.lower()
                     st.session_state.tentatives = 0
-                    st.success("Connexion reussie."); time.sleep(0.8); st.rerun()
+                    st.success("Connexion réussie."); time.sleep(0.8); st.rerun()
                 else:
                     st.session_state.tentatives += 1
-                    st.markdown("<div class='adanger'>Identifiant ou mot de passe incorrect.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='k-alert-danger'>Identifiant ou mot de passe incorrect.</div>", unsafe_allow_html=True)
         
         else:
-            st.markdown("""<div style='background:#111118;border:1px solid #1e1e2e;border-radius:20px;padding:36px 32px;margin-top:20px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Inscription</div>
-                <div style='font-family:Space Mono,monospace;font-size:.75rem;color:#666680;margin-bottom:24px'>Creez votre compte personnel</div>
+            st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
+                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>📝 Inscription</div>
+                <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Créez votre compte personnel</div>
             </div>""", unsafe_allow_html=True)
             new_login = st.text_input("Nouvel Identifiant")
             new_name  = st.text_input("Nom Complet")
-            new_role  = st.selectbox("Role", ["Analyste Cyber", "Medecin"])
+            new_role  = st.selectbox("Rôle", ["Analyste Cyber", "Medecin"])
             new_pass  = st.text_input("Nouveau Mot de passe", type="password")
-            if st.button("CREER MON COMPTE", type="primary"):
+            if st.button("CRÉER MON COMPTE", type="primary", use_container_width=True):
                 if new_login and new_pass and new_name:
                     is_strong, msg_strong = check_password_strength(new_pass)
                     if not is_strong:
-                        st.markdown(f"<div class='adanger'>{msg_strong}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div class='k-alert-danger'>{msg_strong}</div>", unsafe_allow_html=True)
                     else:
-                        # Ici on ajouterait à PostgreSQL en temps normal
                         USERS[new_login.lower()] = {
                             "hash": h(new_pass),
                             "role": new_role,
                             "nom": new_name,
                             "acces": ["Dashboard", "Cybersecurite"] if new_role == "Analyste Cyber" else ["Dashboard", "Sante"]
                         }
-                        st.success("Compte cree avec succes ! Connectez-vous.")
+                        st.markdown("<div class='k-alert-success'>✅ Compte créé avec succès ! Connectez-vous.</div>", unsafe_allow_html=True)
                         st.session_state.auth_mode = "Connexion"
                         time.sleep(1.5)
                         st.rerun()
                 else:
                     st.error("Veuillez remplir tous les champs.")
 
-        st.markdown("<div style='margin-top:20px;font-family:Space Mono,monospace;font-size:.72rem;color:#444460;text-align:center'>Comptes demo :<br>admin / kotighi2024 &nbsp;|&nbsp; analyste / analyse123 &nbsp;|&nbsp; medecin / sante456</div>", unsafe_allow_html=True)
+        st.markdown("""<div style='margin-top:24px;text-align:center'>
+            <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.72rem'>
+                Comptes démo :<br>
+                <span style='color:#00E5FF'>admin</span> / kotighi2024 &nbsp;·&nbsp; 
+                <span style='color:#00E5FF'>analyste</span> / analyse123 &nbsp;·&nbsp; 
+                <span style='color:#00E5FF'>medecin</span> / sante456
+            </div>
+        </div>""", unsafe_allow_html=True)
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
@@ -354,23 +619,23 @@ def app():
         st.session_state.theme = st.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
         apply_theme()
         
-        # LOGO INTEGRATION
+        # LOGO
         c_logo, _ = st.columns([1, 0.1])
         with c_logo:
-            logo_color = "#e8e8f0" if st.session_state.theme == "Sombre" else "#2c3e50"
+            logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
             st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
             
-        st.markdown(f"""<div style='text-align:center;padding-bottom:16px'>
-            <div style='font-family:Space Mono,monospace;font-size:.65rem;color:#666680;letter-spacing:2px;margin-top:4px'>V2.0 • ULTIMATE EDITION</div>
+        st.markdown("""<div style='text-align:center;padding-bottom:20px'>
+            <div class='k-badge' style='margin:6px auto;display:inline-flex'>V3.0 · ENTERPRISE</div>
         </div>""", unsafe_allow_html=True)
         
-        # User Profile Card in Sidebar
+        # User Profile Card
         user = st.session_state.utilisateur
         st.markdown(f"""
-        <div style='background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)'>
-            <div style='font-size:0.8rem;color:#888'>Connecté en tant que</div>
-            <div style='font-weight:bold;color:#fff;font-size:0.95rem'>👤 {user['nom']}</div>
-            <div style='font-size:0.75rem;color:#00f5c4;margin-top:4px;text-transform:uppercase;letter-spacing:1px'>{user['role']}</div>
+        <div class='k-profile'>
+            <div class='k-label'>Connecté en tant que</div>
+            <div class='k-profile-name'>👤 {user['nom']}</div>
+            <div class='k-profile-role'>{user['role']}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -378,20 +643,21 @@ def app():
         page = st.radio("Navigation", pages, label_visibility="collapsed")
         
         st.markdown("---")
-        if st.button("Se déconnecter"):
+        if st.button("🚪 Se déconnecter", use_container_width=True):
             st.session_state.connecte = False
             st.rerun()
 
-    # DASHBOARD UNIFIÉ (ACCUEIL + STATS)
+    # ═══════════════════════════════════════════════════════════════
+    #  DASHBOARD
+    # ═══════════════════════════════════════════════════════════════
     if page == "Dashboard":
-        # HERO SECTION RÉDUITE
         c1, c2 = st.columns([2, 1])
         with c1:
             st.markdown(f"""
-            <div style='margin-top: 0px;'>
-                <div class='ubadge'>TABLEAU DE BORD CENTRALISÉ</div>
-                <h1 style='font-size:2rem!important'>Bienvenue, {user['nom']}</h1>
-                <p style='font-size: 1rem; color: #888; line-height: 1.4; margin-bottom: 20px;'>
+            <div style='margin-top:0'>
+                <div class='k-badge'>TABLEAU DE BORD CENTRALISÉ</div>
+                <h1 style='margin-top:12px;font-size:2rem!important'>Bienvenue, {user['nom']}</h1>
+                <p class='k-subtext' style='font-size:.95rem;line-height:1.5;margin-bottom:20px'>
                     Surveillance active des systèmes et état de santé global.
                 </p>
             </div>
@@ -403,7 +669,7 @@ def app():
 
         st.divider()
 
-        # METRIQUES CLÉS
+        # KPI CARDS
         np.random.seed(int(time.time()))
         c1,c2,c3,c4 = st.columns(4)
         with c1: st.metric("Connexions analysées","12 847","+234")
@@ -413,7 +679,7 @@ def app():
         
         st.markdown("<br>",unsafe_allow_html=True)
         
-        # GRAPHIQUES ET ACCÈS RAPIDE
+        # CHARTS + QUICK ACCESS
         cl,cr = st.columns([2, 1])
         
         with cl:
@@ -424,35 +690,46 @@ def app():
                 "Requêtes": np.random.randint(100, 500, 24),
                 "Menaces": np.random.randint(0, 50, 24)
             })
-            fig_line = px.line(activity_data, x="Heure", y=["Requêtes", "Menaces"], 
-                              color_discrete_sequence=["#00f5c4", "#ff4757"],
-                              template="plotly_dark")
-            fig_line.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
-                                  height=320, margin=dict(t=20, b=20, l=20, r=20),
-                                  legend=dict(orientation="h", y=1.1))
+            fig_line = go.Figure()
+            fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Requêtes"], name="Requêtes",
+                line=dict(color="#00E5FF", width=2), fill="tozeroy",
+                fillcolor="rgba(0,229,255,0.05)"))
+            fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Menaces"], name="Menaces",
+                line=dict(color="#EF4444", width=2), fill="tozeroy",
+                fillcolor="rgba(239,68,68,0.05)"))
+            fig_line.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                height=320, margin=dict(t=20, b=30, l=40, r=20),
+                legend=dict(orientation="h", y=1.12, font=dict(family="JetBrains Mono", size=11)),
+                xaxis=dict(showgrid=False, color="#64748B", title=""),
+                yaxis=dict(showgrid=True, gridcolor="#1C1F2E20", color="#64748B", title=""),
+                font=dict(family="Inter", color="#64748B")
+            )
             st.plotly_chart(fig_line, use_container_width=True)
 
         with cr:
             st.markdown("#### 🚀 Accès Rapide")
             if "Cybersecurite" in user["acces"]:
                 st.markdown("""
-                <div class='feature-card' style='margin-bottom:15px;padding:15px'>
-                    <div style='font-weight:700;color:#00f5c4;margin-bottom:5px'>🛡️ Module Cyber</div>
-                    <div style='font-size:0.8rem;color:#888'>Lancer un scan réseau</div>
+                <div class='feature-card' style='margin-bottom:12px'>
+                    <div style='font-size:1.5rem;margin-bottom:8px'>🛡️</div>
+                    <div style='font-weight:700;color:#00E5FF;margin-bottom:4px;font-size:.95rem'>Module Cyber</div>
+                    <div class='k-subtext' style='font-size:.8rem'>Lancer un scan réseau</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             if "Sante" in user["acces"]:
                 st.markdown("""
-                <div class='feature-card' style='padding:15px'>
-                    <div style='font-weight:700;color:#ff6b6b;margin-bottom:5px'>🩺 Module Santé</div>
-                    <div style='font-size:0.8rem;color:#888'>Nouveau diagnostic</div>
+                <div class='feature-card'>
+                    <div style='font-size:1.5rem;margin-bottom:8px'>🩺</div>
+                    <div style='font-weight:700;color:#8B5CF6;margin-bottom:4px;font-size:.95rem'>Module Santé</div>
+                    <div class='k-subtext' style='font-size:.8rem'>Nouveau diagnostic</div>
                 </div>
                 """, unsafe_allow_html=True)
 
         st.markdown("<br>",unsafe_allow_html=True)
         
-        # HISTORIQUE RÉCENT (Aperçu)
+        # RECENT ACTIVITY
         st.markdown("#### 🕒 Dernières Activités")
         if st.session_state.historique:
             df_hist = pd.DataFrame(st.session_state.historique[::-1]).head(5)
@@ -460,45 +737,11 @@ def app():
         else:
             st.info("Aucune activité récente.")
     
-    # CYBERSECURITE
+    # ═══════════════════════════════════════════════════════════════
+    #  CYBERSECURITE — SOC TERMINAL
+    # ═══════════════════════════════════════════════════════════════
     elif page == "Cybersecurite":
-        # --- UI CONSOLE SOC ---
-        st.markdown("""
-        <style>
-        .stApp { background: #000000; }
-        .block-container { max-width: 95%!important; padding-top: 2rem; }
-        h1, h2, h3 { font-family: 'Space Mono', monospace!important; text-transform: uppercase; letter-spacing: 2px; }
-        .stTextInput input, .stTextArea textarea { 
-            background: #0a0a0f!important; 
-            border: 1px solid #333!important; 
-            color: #00f5c4!important; 
-            font-family: 'Space Mono', monospace!important;
-        }
-        .soc-panel {
-            border: 1px solid #1e1e2e;
-            background: #050508;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .soc-header {
-            color: #666;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #1e1e2e;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-            font-family: 'Space Mono', monospace;
-        }
-        .status-dot {
-            height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px;
-        }
-        .dot-green { background: #00f5c4; box-shadow: 0 0 5px #00f5c4; }
-        .dot-red { background: #ff4757; box-shadow: 0 0 5px #ff4757; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown("## <span style='color:#00f5c4'>//</span> SOC TERMINAL <span style='font-size:0.8rem;color:#666'>v3.0.1-BETA</span>", unsafe_allow_html=True)
+        st.markdown("## <span style='color:#00E5FF'>//</span> SOC TERMINAL <span class='k-badge' style='vertical-align:middle;margin-left:8px'>v3.1 · LIVE</span>", unsafe_allow_html=True)
         
         m_rf, m_gb, sc = get_cyber()
         
@@ -623,12 +866,12 @@ def app():
                         with cols[0]: st.markdown(f"<div class='status-dot {status_color}'></div>", unsafe_allow_html=True)
                         with cols[1]: st.markdown(f"<span style='font-family:monospace;font-size:1.1rem'>{target['ip']}</span>", unsafe_allow_html=True)
                         with cols[2]: st.caption(f"Trafic: {traffic} req/m")
-                        with cols[3]: st.markdown(f"<span style='color:{'#ff4757' if is_threat else '#00f5c4'}'>{status_txt}</span>", unsafe_allow_html=True)
+                        with cols[3]: st.markdown(f"<span style='color:{'#EF4444' if is_threat else '#10B981'}'>{status_txt}</span>", unsafe_allow_html=True)
                         with cols[4]: 
                             if st.button("STOP", key=f"del_{target['ip']}"):
                                 st.session_state.watchlist.remove(target)
                                 st.rerun()
-                        st.markdown("<div style='border-bottom:1px solid #1e1e2e;margin:5px 0'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='border-bottom:1px solid #1C1F2E;margin:5px 0'></div>", unsafe_allow_html=True)
                         
                         if is_threat:
                             st.toast(f"🚨 ALERTE SUR {target['ip']}", icon="🔥")
@@ -646,7 +889,7 @@ def app():
                 f"[{(datetime.datetime.now()-datetime.timedelta(minutes=1)).strftime('%H:%M:%S')}] API KOTIGHI CONNECTED"
             ]
             for evt in events:
-                st.markdown(f"<div style='font-family:monospace;font-size:0.7rem;color:#00f5c4;margin-bottom:4px'>{evt}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='k-mono' style='font-size:0.72rem;color:#00E5FF;margin-bottom:6px'>{evt}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
             
             st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
@@ -656,73 +899,12 @@ def app():
             st.progress(12, text="NETWORK I/O")
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # SANTE
+    # ═══════════════════════════════════════════════════════════════
+    #  SANTÉ — MODULE CLINIQUE
+    # ═══════════════════════════════════════════════════════════════
     elif page == "Sante":
-        # --- THEME CLINIQUE FUTURISTE (ADAPTÉ) ---
-        is_dark = st.session_state.theme == "Sombre"
-        card_bg = "rgba(17, 17, 24, 0.7)" if is_dark else "rgba(255, 255, 255, 0.85)"
-        text_col = "#e8e8f0" if is_dark else "#2c3e50"
-        border_col = "rgba(255, 255, 255, 0.1)" if is_dark else "rgba(255, 255, 255, 0.4)"
-        
-        st.markdown(f"""
-        <style>
-        /* Tabs Styling Adaptatif */
-        .stTabs [data-baseweb="tab-list"] {{
-            background-color: {card_bg};
-            border-radius: 10px;
-            padding: 5px;
-            border: 1px solid {border_col};
-        }}
-        .stTabs [data-baseweb="tab"] {{
-            color: #666 !important;
-        }}
-        .stTabs [data-baseweb="tab"][aria-selected="true"] {{
-            background-color: {'#1e1e2e' if is_dark else 'white'};
-            color: #00d2d3 !important;
-            font-weight: 800;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }}
-        
-        .clinic-card {{
-            background: {card_bg};
-            backdrop-filter: blur(12px);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            border: 1px solid {border_col};
-            border-left: 6px solid #00d2d3;
-        }}
-        .clinic-header {{
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            color: {text_col} !important;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }}
-        .stButton>button {{
-            border-radius: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #00d2d3 0%, #00b894 100%) !important;
-            color: white !important;
-            border: none !important;
-        }}
-        .stButton>button:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(0,0,0,0.15);
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown("<h2 class='clinic-header'>// MODULE CLINIQUE AVANCÉ</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#576574; font-size:1rem; font-family:monospace;'>SYSTEME D'AIDE AU DIAGNOSTIC MÉDICAL PAR IA v2.4</p>", unsafe_allow_html=True)
+        st.markdown("## <span style='color:#00E5FF'>//</span> MODULE CLINIQUE <span class='k-badge' style='vertical-align:middle;margin-left:8px'>v2.4 · IA</span>", unsafe_allow_html=True)
+        st.markdown("<p class='k-subtext k-mono' style='font-size:.9rem'>SYSTÈME D'AIDE AU DIAGNOSTIC MÉDICAL PAR IA</p>", unsafe_allow_html=True)
         st.divider()
         
         ms, labels, conseils_prev = get_sante()
@@ -798,18 +980,17 @@ def app():
                         
                         # Logique d'urgence
                         is_urgent = "cardiaque" in diag.lower() or "covid" in diag.lower() or conf < 60
-                        color_res = "#ff4757" if is_urgent else ("#ffa502" if conf < 80 else "#00d2d3")
+                        color_res = "#EF4444" if is_urgent else ("#F59E0B" if conf < 80 else "#10B981")
                         icon_res = "🚨" if is_urgent else "🩺"
-                        bg_res = "#ffeaa7" if is_urgent else "#d1ccc0" 
                         
                         # Affichage Résultat
                         st.markdown(f"""
-                        <div style="background:white; padding:25px; border-radius:20px; border-top: 10px solid {color_res}; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align:center;">
-                            <div style="font-size:3.5rem; margin-bottom:10px;">{icon_res}</div>
-                            <h3 style="color:{color_res}; margin:0; text-transform:uppercase; font-family:'Syne';">{diag}</h3>
-                            <div style="height:2px; background:#eee; margin:15px 0;"></div>
-                            <p style="font-size:0.9rem; color:#666; margin-bottom:5px;">FIABILITÉ IA</p>
-                            <div style="font-size:2rem; font-weight:800; color:{color_res};">{conf:.1f}%</div>
+                        <div class='k-card' style='border-top:3px solid {color_res};text-align:center;padding:30px'>
+                            <div style='font-size:3.5rem;margin-bottom:12px'>{icon_res}</div>
+                            <h3 style='color:{color_res};margin:0;text-transform:uppercase;font-weight:800'>{diag}</h3>
+                            <div style='height:1px;background:#1C1F2E;margin:16px 0'></div>
+                            <div class='k-label' style='margin-bottom:6px'>FIABILITÉ IA</div>
+                            <div class='k-mono' style='font-size:2rem;font-weight:800;color:{color_res}'>{conf:.1f}%</div>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -855,27 +1036,29 @@ def app():
                             st.warning("Service PDF indisponible momentanément.")
             
             else:
-                # Placeholder state
                 st.markdown("""
-                <div style="text-align:center; color:#b2bec3; padding:50px; background:rgba(255,255,255,0.5); border-radius:20px;">
-                    <div style="font-size:4rem; opacity:0.5; margin-bottom:10px;">🏥</div>
-                    <p style="font-family:'Syne'; font-size:1.2rem;">En attente de données...</p>
-                    <p style="font-size:0.8rem;">Veuillez remplir le formulaire à gauche.</p>
+                <div class='k-card' style='text-align:center;padding:60px 30px'>
+                    <div style='font-size:4rem;opacity:.4;margin-bottom:16px'>🏥</div>
+                    <p style='font-size:1.1rem;font-weight:600;margin-bottom:6px'>En attente de données...</p>
+                    <p class='k-subtext' style='font-size:.85rem'>Veuillez remplir le formulaire à gauche.</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-    # GESTION
+    # ═══════════════════════════════════════════════════════════════
+    #  GESTION
+    # ═══════════════════════════════════════════════════════════════
     elif page == "Gestion":
-        st.markdown("## Gestion des utilisateurs"); st.divider()
-        df_u = pd.DataFrame([{"Login":k,"Nom":v["nom"],"Role":v["role"],"Modules":", ".join(v["acces"])} for k,v in USERS.items()])
+        st.markdown("## <span style='color:#00E5FF'>//</span> GESTION <span class='k-badge' style='vertical-align:middle;margin-left:8px'>ADMIN</span>", unsafe_allow_html=True)
+        st.divider()
+        
+        st.markdown("#### 👥 Utilisateurs Enregistrés")
+        df_u = pd.DataFrame([{"Login":k,"Nom":v["nom"],"Rôle":v["role"],"Modules":", ".join(v["acces"])} for k,v in USERS.items()])
         st.dataframe(df_u,use_container_width=True,hide_index=True)
         st.markdown("<br>",unsafe_allow_html=True)
         
-        # --- HISTORIQUE GLOBAL SÉCURISÉ ---
-        st.markdown("### 🛡️ Logs de sécurité globaux")
+        st.markdown("#### 🛡️ Logs de Sécurité Globaux")
         if st.session_state.historique:
             df_global = pd.DataFrame(st.session_state.historique[::-1])
-            # Masquage des données sensibles pour l'affichage
             if "IP" in df_global.columns:
                 df_global["IP"] = df_global["IP"].apply(mask_data)
             if "Utilisateur" in df_global.columns:
@@ -886,7 +1069,7 @@ def app():
         else:
             st.info("Aucun log disponible.")
             
-        st.markdown("<div class='infob'>Pour ajouter un utilisateur : ajouter une entree dans USERS avec h() pour le mot de passe.<br><br>En production : utiliser PostgreSQL ou Firebase Auth.</div>",unsafe_allow_html=True)
+        st.markdown("<div class='k-info'>Pour ajouter un utilisateur : ajouter une entrée dans USERS avec h() pour le mot de passe.<br><br>En production : utiliser PostgreSQL ou Firebase Auth.</div>",unsafe_allow_html=True)
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
