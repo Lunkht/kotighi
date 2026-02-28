@@ -618,6 +618,9 @@ def page_login():
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
+    # Application du thème globalement (sur toutes les pages)
+    apply_theme()
+
     # SIDEBAR
     with st.sidebar:
         # LOGO
@@ -665,13 +668,14 @@ def app():
             """, unsafe_allow_html=True)
             
         with c2:
-            # SWITCH DE THÈME (Déplacé ici)
-            is_dark = st.toggle("🌙 Mode Sombre", value=(st.session_state.theme == "Sombre"))
-            new_theme = "Sombre" if is_dark else "Clair"
-            if new_theme != st.session_state.theme:
-                st.session_state.theme = new_theme
+            # SWITCH DE THÈME (Radio horizontal)
+            theme_choice = st.radio("Thème d'interface", ["Sombre", "Clair"], 
+                                  index=0 if st.session_state.theme == "Sombre" else 1,
+                                  horizontal=True, label_visibility="collapsed")
+            
+            if theme_choice != st.session_state.theme:
+                st.session_state.theme = theme_choice
                 st.rerun()
-            apply_theme()
             
             if lottie_scan:
                 st_lottie(lottie_scan, height=150, key="hero_anim_mini")
