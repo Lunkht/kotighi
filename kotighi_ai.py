@@ -39,7 +39,7 @@ from sklearn.preprocessing import LabelEncoder        # convertir texte → chif
 
 def module_cybersecurite():
     print("\n" + "="*55)
-    print("  🔐 MODULE CYBERSÉCURITÉ — Détection d'intrusion")
+    print("MODULE CYBERSÉCURITÉ — Détection d'intrusion")
     print("="*55)
 
     # ── ÉTAPE 1 : Créer les données d'entraînement ─────────
@@ -144,7 +144,7 @@ def module_cybersecurite():
 
 def module_sante():
     print("\n" + "="*55)
-    print("  🏥 MODULE SANTÉ — Prédiction de maladie")
+    print("MODULE SANTÉ — Prédiction de maladie")
     print("="*55)
 
     # ── ÉTAPE 1 : Créer les données ─────────────────────────
