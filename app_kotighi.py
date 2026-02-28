@@ -465,92 +465,183 @@ def app():
     
     # CYBERSECURITE
     elif page == "Cybersecurite":
-        st.markdown("## Detection d'intrusion reseau"); st.divider()
+        # --- UI CONSOLE SOC ---
+        st.markdown("""
+        <style>
+        .stApp { background: #000000; }
+        .block-container { max-width: 95%!important; padding-top: 2rem; }
+        h1, h2, h3 { font-family: 'Space Mono', monospace!important; text-transform: uppercase; letter-spacing: 2px; }
+        .stTextInput input, .stTextArea textarea { 
+            background: #0a0a0f!important; 
+            border: 1px solid #333!important; 
+            color: #00f5c4!important; 
+            font-family: 'Space Mono', monospace!important;
+        }
+        .soc-panel {
+            border: 1px solid #1e1e2e;
+            background: #050508;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .soc-header {
+            color: #666;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #1e1e2e;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-family: 'Space Mono', monospace;
+        }
+        .status-dot {
+            height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px;
+        }
+        .dot-green { background: #00f5c4; box-shadow: 0 0 5px #00f5c4; }
+        .dot-red { background: #ff4757; box-shadow: 0 0 5px #ff4757; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown("## <span style='color:#00f5c4'>//</span> SOC TERMINAL <span style='font-size:0.8rem;color:#666'>v3.0.1-BETA</span>", unsafe_allow_html=True)
+        
         m_rf, m_gb, sc = get_cyber()
-        col1,col2 = st.columns(2)
-        with col1:
-            st.markdown("### Parametres")
-            ip   = st.text_input("Adresse IP source", value="192.168.1.100")
-            req  = st.slider("Requetes par minute",0,8000,150)
-            dur  = st.slider("Duree (sec)",0,300,45)
-            oct_ = st.number_input("Octets transferes",0,1000000,2500)
-            ca,cb = st.columns(2)
-            with ca: ports = st.number_input("Ports scannes",1,500,2)
-            with cb: terr  = st.slider("Taux erreur",0.0,1.0,0.02,0.01)
-            flag = st.checkbox("Flag suspect",value=False)
-            go_c = st.button("ANALYSER LA CONNEXION",type="primary")
-        with col2:
-            st.markdown("### Résultat")
-            if go_c:
-                # --- PROGRESS BAR ANIMÉE ---
-                my_bar = st.progress(0, text="Initialisation...")
-                for i, step in enumerate(["Analyse des paquets...", "Scan des signatures...", "Vérification des ports...", "Calcul du score de risque..."]):
-                    time.sleep(0.3)
-                    my_bar.progress((i+1)*25, text=step)
-                time.sleep(0.2); my_bar.empty()
+        
+        # Initialisation Watchlist
+        if "watchlist" not in st.session_state: st.session_state.watchlist = []
+        
+        col_main, col_side = st.columns([3, 1])
+        
+        with col_main:
+            # ONGLETS FONCTIONNELS
+            tab1, tab2 = st.tabs(["SCAN MANUEL / BATCH", "LIVE MONITOR"])
+            
+            with tab1:
+                st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
+                st.markdown("<div class='soc-header'>CIBLE(S) D'ANALYSE</div>", unsafe_allow_html=True)
                 
-                feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
-                feat_scaled = sc.transform(feat)
+                ips_input = st.text_area("Adresses IP (une par ligne)", height=100, 
+                                       placeholder="192.168.1.10\n10.0.0.5\n172.16.0.1",
+                                       help="Entrez plusieurs IPs pour une analyse en lot.")
                 
-                # --- SYSTÈME DE VOTE (RF + GB) ---
-                p_rf = m_rf.predict_proba(feat_scaled)[0]
-                p_gb = m_gb.predict_proba(feat_scaled)[0]
-                proba_moy = (p_rf + p_gb) / 2
-                pred = 1 if proba_moy[1] > 0.5 else 0
-                conf = max(proba_moy) * 100
+                c1, c2, c3 = st.columns(3)
+                with c1: req = st.number_input("Req/min (Simulé)", 0, 10000, 150)
+                with c2: ports = st.number_input("Ports ouverts (Simulé)", 0, 1000, 5)
+                with c3: terr = st.number_input("Taux erreur (Simulé)", 0.0, 1.0, 0.01)
                 
-                if pred==0:
-                    type_att="Normal"
-                    st.toast("✅ Connexion normale détectée", icon="🟢")
-                    col_a, col_b = st.columns([1, 4])
-                    if lottie_success:
-                        with col_a: st_lottie(lottie_success, height=60, key="ok_c")
-                    else:
-                        with col_a: st.markdown("✅")
-                    with col_b: st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
+                col_act, col_add = st.columns([1, 1])
+                with col_act:
+                    go_scan = st.button("LANCER LE SCAN BATCH", type="primary", use_container_width=True)
+                with col_add:
+                    add_watch = st.button("AJOUTER À LA SURVEILLANCE", use_container_width=True)
+                
+                if go_scan and ips_input:
+                    ips = [ip.strip() for ip in ips_input.split('\n') if ip.strip()]
+                    results = []
+                    
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
+                    
+                    for i, ip in enumerate(ips):
+                        status_text.text(f"Scanning {ip}...")
+                        # Simulation variation données
+                        sim_req = req + np.random.randint(-50, 50)
+                        sim_ports = ports + np.random.randint(0, 2)
+                        
+                        feat = pd.DataFrame([{"requetes_min":sim_req,"duree":45,"octets":2500,"ports_scanes":sim_ports,"taux_erreur":terr,"flag_suspect":0}])
+                        feat_scaled = sc.transform(feat)
+                        
+                        # Vote
+                        p_rf = m_rf.predict_proba(feat_scaled)[0]
+                        p_gb = m_gb.predict_proba(feat_scaled)[0]
+                        proba_moy = (p_rf + p_gb) / 2
+                        score = proba_moy[1]
+                        
+                        verdict = "CRITIQUE" if score > 0.8 else ("SUSPECT" if score > 0.5 else "SECURE")
+                        results.append({"IP": ip, "Status": verdict, "Score": f"{score*100:.1f}%", "Ports": sim_ports})
+                        
+                        time.sleep(0.1) # Effet scan rapide
+                        progress_bar.progress((i + 1) / len(ips))
+                        
+                    status_text.empty()
+                    progress_bar.empty()
+                    
+                    # Affichage style Terminal
+                    st.markdown("<div class='soc-header'>RÉSULTATS DU SCAN</div>", unsafe_allow_html=True)
+                    df_res = pd.DataFrame(results)
+                    
+                    # Style conditionnel
+                    def highlight_status(val):
+                        color = '#ff4757' if val == 'CRITIQUE' else ('#ffa502' if val == 'SUSPECT' else '#00f5c4')
+                        return f'color: {color}; font-weight: bold'
+                        
+                    st.dataframe(df_res.style.applymap(highlight_status, subset=['Status']), use_container_width=True)
+                
+                if add_watch and ips_input:
+                    new_ips = [ip.strip() for ip in ips_input.split('\n') if ip.strip()]
+                    for ip in new_ips:
+                        if ip not in [w["ip"] for w in st.session_state.watchlist]:
+                            st.session_state.watchlist.append({"ip": ip, "added_at": datetime.datetime.now().strftime("%H:%M"), "status": "PENDING"})
+                    st.success(f"{len(new_ips)} cible(s) ajoutée(s) à la surveillance continue.")
+                
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            with tab2:
+                st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
+                st.markdown("<div class='soc-header'>SURVEILLANCE ACTIVE (LIVE MONITOR)</div>", unsafe_allow_html=True)
+                
+                if not st.session_state.watchlist:
+                    st.info("Aucune cible sous surveillance. Ajoutez des IPs depuis l'onglet Scan.")
                 else:
-                    type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
-                    st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
-                    col_a, col_b = st.columns([1, 4])
-                    if lottie_alert:
-                        with col_a: st_lottie(lottie_alert, height=60, key="warn_c")
-                    else:
-                        with col_a: st.markdown("🚨")
-                    with col_b: st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
+                    # Simulation de mise à jour temps réel
+                    col_metrics = st.columns(4)
+                    col_metrics[0].metric("Cibles Actives", len(st.session_state.watchlist))
+                    col_metrics[1].metric("Alertes (1h)", np.random.randint(0, 5))
+                    col_metrics[2].metric("Bande Passante", f"{np.random.randint(50, 500)} Mbps")
+                    
+                    st.markdown("---")
+                    
+                    for target in st.session_state.watchlist:
+                        # Simulation état
+                        is_threat = np.random.random() > 0.8
+                        status_color = "dot-red" if is_threat else "dot-green"
+                        status_txt = "MENACE DÉTECTÉE" if is_threat else "NORMAL"
+                        traffic = np.random.randint(100, 2000)
+                        
+                        cols = st.columns([0.5, 2, 1, 1, 1])
+                        with cols[0]: st.markdown(f"<div class='status-dot {status_color}'></div>", unsafe_allow_html=True)
+                        with cols[1]: st.markdown(f"<span style='font-family:monospace;font-size:1.1rem'>{target['ip']}</span>", unsafe_allow_html=True)
+                        with cols[2]: st.caption(f"Trafic: {traffic} req/m")
+                        with cols[3]: st.markdown(f"<span style='color:{'#ff4757' if is_threat else '#00f5c4'}'>{status_txt}</span>", unsafe_allow_html=True)
+                        with cols[4]: 
+                            if st.button("STOP", key=f"del_{target['ip']}"):
+                                st.session_state.watchlist.remove(target)
+                                st.rerun()
+                        st.markdown("<div style='border-bottom:1px solid #1e1e2e;margin:5px 0'></div>", unsafe_allow_html=True)
+                        
+                        if is_threat:
+                            st.toast(f"🚨 ALERTE SUR {target['ip']}", icon="🔥")
                 
-                fig = go.Figure(go.Indicator(mode="gauge+number",value=proba_moy[1]*100,
-                        title={"text":"Score de Risque","font":{"color":"#e8e8f0","family":"Syne"}},
-                        gauge={"axis":{"range":[0,100]},"bar":{"color":"#ff4757" if pred==1 else "#00f5c4"},"bgcolor":"#111118","bordercolor":"#1e1e2e",
-                               "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
-                        number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
-                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
-                st.plotly_chart(fig,use_container_width=True)
-                
-                # --- JOURNALISATION STRUCTURÉE ---
-                log_entry = {
-                    "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "Module": "Cybersecurite",
-                    "IP": ip,
-                    "Resultat": type_att,
-                    "Confiance": f"{conf:.0f}%",
-                    "Utilisateur": login,
-                    "Score": f"{proba_moy[1]*100:.1f}%"
-                }
-                st.session_state.historique.append(log_entry)
-                
-                # --- GENERATION RAPPORT PDF ---
-                try:
-                    from rapport_pdf import generer_rapport_cyber
-                    pdf_cyber = generer_rapport_cyber({
-                        "ip": ip, "requetes": req, "duree": dur,
-                        "octets": oct_, "ports": ports, "taux_erreur": terr,
-                        "prediction": pred, "type_attaque": type_att, "confiance": conf,
-                        "utilisateur": login, "role": user["role"]
-                    })
-                    st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
-                                        file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
-                except ImportError:
-                    st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
+                st.markdown("</div>", unsafe_allow_html=True)
+
+        with col_side:
+            st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
+            st.markdown("<div class='soc-header'>FLUX D'ÉVÉNEMENTS</div>", unsafe_allow_html=True)
+            # Logs fictifs défilants
+            events = [
+                f"[{datetime.datetime.now().strftime('%H:%M:%S')}] SCAN BLOCK 192.168.1.45",
+                f"[{datetime.datetime.now().strftime('%H:%M:%S')}] SSH FAIL 10.0.0.12",
+                f"[{datetime.datetime.now().strftime('%H:%M:%S')}] FW UPDATE SUCCESS",
+                f"[{(datetime.datetime.now()-datetime.timedelta(minutes=1)).strftime('%H:%M:%S')}] API KOTIGHI CONNECTED"
+            ]
+            for evt in events:
+                st.markdown(f"<div style='font-family:monospace;font-size:0.7rem;color:#00f5c4;margin-bottom:4px'>{evt}</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
+            st.markdown("<div class='soc-header'>ÉTAT SYSTÈME</div>", unsafe_allow_html=True)
+            st.progress(88, text="CPU LOAD")
+            st.progress(45, text="RAM USAGE")
+            st.progress(12, text="NETWORK I/O")
+            st.markdown("</div>", unsafe_allow_html=True)
 
     # SANTE
     elif page == "Sante":
