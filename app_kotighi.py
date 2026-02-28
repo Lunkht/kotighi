@@ -49,9 +49,9 @@ def mask_data(data):
 
 # On garde le dictionnaire USERS en fallback si PG n'est pas dispo
 USERS = {
-    "admin":    {"hash":h("kotighi2024"),"role":"Administrateur","nom":"Admin Principal",   "acces":["Accueil","Cybersecurite","Sante","Dashboard","Gestion"]},
-    "analyste": {"hash":h("analyse123"), "role":"Analyste Cyber", "nom":"Analyste Securite","acces":["Accueil","Cybersecurite","Dashboard"]},
-    "medecin":  {"hash":h("sante456"),   "role":"Medecin",        "nom":"Praticien Medical","acces":["Accueil","Sante","Dashboard"]},
+    "admin":    {"hash":h("kotighi2024"),"role":"Administrateur","nom":"Admin Principal",   "acces":["Dashboard","Cybersecurite","Sante","Gestion"]},
+    "analyste": {"hash":h("analyse123"), "role":"Analyste Cyber", "nom":"Jean Dupont",      "acces":["Dashboard","Cybersecurite"]},
+    "medecin":  {"hash":h("sante456"),   "role":"Medecin",        "nom":"Dr. House",        "acces":["Dashboard","Sante"]},
 }
 
 def verifier(login, mdp):
@@ -345,7 +345,7 @@ def page_login():
                             "hash": h(new_pass),
                             "role": new_role,
                             "nom": new_name,
-                            "acces": ["Accueil", "Cybersecurite", "Dashboard"] if new_role == "Analyste Cyber" else ["Accueil", "Sante", "Dashboard"]
+                            "acces": ["Dashboard", "Cybersecurite"] if new_role == "Analyste Cyber" else ["Dashboard", "Sante"]
                         }
                         st.success("Compte cree avec succes ! Connectez-vous.")
                         st.session_state.auth_mode = "Connexion"
@@ -377,7 +377,7 @@ def app():
         </div>
         """, unsafe_allow_html=True)
 
-        pages = [p for p in user["acces"] if p in ["Accueil", "Cybersecurite", "Sante", "Dashboard", "Gestion"]]
+        pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion"]]
         page = st.radio("Navigation", pages, label_visibility="collapsed")
         
         st.markdown("---")
@@ -385,78 +385,83 @@ def app():
             st.session_state.connecte = False
             st.rerun()
 
-    # ACCUEIL
-    if page == "Accueil":
-        # HERO SECTION
-        c1, c2 = st.columns([1.5, 1])
+    # DASHBOARD UNIFIÉ (ACCUEIL + STATS)
+    if page == "Dashboard":
+        # HERO SECTION RÉDUITE
+        c1, c2 = st.columns([2, 1])
         with c1:
             st.markdown(f"""
-            <div style='margin-top: 20px;'>
-                <div class='ubadge'>INTELLIGENCE ARTIFICIELLE HYBRIDE</div>
-                <h1>Sécurisez vos réseaux.<br>Protégez votre santé.</h1>
-                <p style='font-size: 1.1rem; color: #888; line-height: 1.6; margin-bottom: 30px;'>
-                    KOTIGHI AI combine la puissance de l'apprentissage automatique pour détecter les intrusions réseaux 
-                    en temps réel et fournir des pré-diagnostics médicaux de haute précision.
+            <div style='margin-top: 0px;'>
+                <div class='ubadge'>TABLEAU DE BORD CENTRALISÉ</div>
+                <h1 style='font-size:2rem!important'>Bienvenue, {user['nom']}</h1>
+                <p style='font-size: 1rem; color: #888; line-height: 1.4; margin-bottom: 20px;'>
+                    Surveillance active des systèmes et état de santé global.
                 </p>
             </div>
             """, unsafe_allow_html=True)
             
-            hc1, hc2 = st.columns(2)
-            with hc1:
-                st.markdown(f"""
-                <div class='feature-card'>
-                    <div style='font-size:1.5rem;margin-bottom:10px'>🛡️</div>
-                    <div style='font-weight:700;color:#00f5c4;margin-bottom:8px'>Cyber-Défense</div>
-                    <div style='font-size:0.85rem;color:#888'>Détection d'attaques DDoS, scans et intrusions avec 99% de précision.</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with hc2:
-                st.markdown(f"""
-                <div class='feature-card'>
-                    <div style='font-size:1.5rem;margin-bottom:10px'>🩺</div>
-                    <div style='font-weight:700;color:#ff6b6b;margin-bottom:8px'>Santé Connectée</div>
-                    <div style='font-size:0.85rem;color:#888'>Analyse de symptômes et conseils de prévention personnalisés.</div>
-                </div>
-                """, unsafe_allow_html=True)
-
         with c2:
             if lottie_scan:
-                st_lottie(lottie_scan, height=400, key="hero_anim")
-            else:
-                # Fallback visuel si l'animation ne charge pas
+                st_lottie(lottie_scan, height=150, key="hero_anim_mini")
+
+        st.divider()
+
+        # METRIQUES CLÉS
+        np.random.seed(int(time.time()))
+        c1,c2,c3,c4 = st.columns(4)
+        with c1: st.metric("Connexions analysées","12 847","+234")
+        with c2: st.metric("Attaques bloquées","1 203","+18")
+        with c3: st.metric("Diagnostics santé","452","+12")
+        with c4: st.metric("Fiabilité IA","99.2%","+0.1%")
+        
+        st.markdown("<br>",unsafe_allow_html=True)
+        
+        # GRAPHIQUES ET ACCÈS RAPIDE
+        cl,cr = st.columns([2, 1])
+        
+        with cl:
+            st.markdown("#### 📈 Activité Temps Réel (24h)")
+            hours = list(range(24))
+            activity_data = pd.DataFrame({
+                "Heure": hours,
+                "Requêtes": np.random.randint(100, 500, 24),
+                "Menaces": np.random.randint(0, 50, 24)
+            })
+            fig_line = px.line(activity_data, x="Heure", y=["Requêtes", "Menaces"], 
+                              color_discrete_sequence=["#00f5c4", "#ff4757"],
+                              template="plotly_dark")
+            fig_line.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
+                                  height=320, margin=dict(t=20, b=20, l=20, r=20),
+                                  legend=dict(orientation="h", y=1.1))
+            st.plotly_chart(fig_line, use_container_width=True)
+
+        with cr:
+            st.markdown("#### 🚀 Accès Rapide")
+            if "Cybersecurite" in user["acces"]:
                 st.markdown("""
-                <div style='background:rgba(0,245,196,0.05);border-radius:50%;width:300px;height:300px;display:flex;align-items:center;justify-content:center;margin:auto;border:2px solid rgba(0,245,196,0.2)'>
-                    <div style='font-size:5rem'>🛡️</div>
+                <div class='feature-card' style='margin-bottom:15px;padding:15px'>
+                    <div style='font-weight:700;color:#00f5c4;margin-bottom:5px'>🛡️ Module Cyber</div>
+                    <div style='font-size:0.8rem;color:#888'>Lancer un scan réseau</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            if "Sante" in user["acces"]:
+                st.markdown("""
+                <div class='feature-card' style='padding:15px'>
+                    <div style='font-weight:700;color:#ff6b6b;margin-bottom:5px'>🩺 Module Santé</div>
+                    <div style='font-size:0.8rem;color:#888'>Nouveau diagnostic</div>
                 </div>
                 """, unsafe_allow_html=True)
 
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("### 🚀 Modules disponibles")
+        st.markdown("<br>",unsafe_allow_html=True)
         
-        m1, m2 = st.columns(2)
-        if "Cybersecurite" in user["acces"]:
-            with m1:
-                st.markdown("""
-                <div class='feature-card' style='height:100%'>
-                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:15px'>
-                        <span style='font-size:1.2rem;font-weight:800;color:#00f5c4'>MODULE CYBER</span>
-                        <span style='background:rgba(0,245,196,0.1);color:#00f5c4;padding:4px 8px;border-radius:4px;font-size:0.7rem'>v2.4</span>
-                    </div>
-                    <p style='color:#888;font-size:0.9rem;margin-bottom:20px'>Console d'analyse de trafic réseau en temps réel avec détection d'anomalies par Random Forest.</p>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        if "Sante" in user["acces"]:
-            with m2:
-                st.markdown("""
-                <div class='feature-card' style='height:100%'>
-                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:15px'>
-                        <span style='font-size:1.2rem;font-weight:800;color:#ff6b6b'>MODULE SANTÉ</span>
-                        <span style='background:rgba(255,107,107,0.1);color:#ff6b6b;padding:4px 8px;border-radius:4px;font-size:0.7rem'>v3.1</span>
-                    </div>
-                    <p style='color:#888;font-size:0.9rem;margin-bottom:20px'>Assistant de diagnostic médical intelligent avec explication des symptômes et conseils.</p>
-                </div>
-                """, unsafe_allow_html=True)
+        # HISTORIQUE RÉCENT (Aperçu)
+        st.markdown("#### 🕒 Dernières Activités")
+        if st.session_state.historique:
+            df_hist = pd.DataFrame(st.session_state.historique[::-1]).head(5)
+            st.dataframe(df_hist,use_container_width=True,hide_index=True)
+        else:
+            st.info("Aucune activité récente.")
     
     # CYBERSECURITE
     elif page == "Cybersecurite":
@@ -645,59 +650,6 @@ def app():
                         st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
                     if urgent: st.error("Appelez le 15 (SAMU)")
                     st.info("Restez hydrate"); st.warning("Consultez un medecin si aggravation")
-
-    # DASHBOARD
-    elif page == "Dashboard":
-        st.markdown("## Dashboard"); st.divider()
-        np.random.seed(7)
-        c1,c2,c3,c4 = st.columns(4)
-        with c1: st.metric("Connexions analysees","12 847","+234")
-        with c2: st.metric("Attaques detectees","1 203","+18")
-        with c3: st.metric("Taux de detection","99.2%","+0.1%")
-        with c4: st.metric("Faux positifs","0.8%","-0.2%")
-        
-        st.markdown("<br>",unsafe_allow_html=True)
-        
-        # --- NOUVEAUX GRAPHIQUES TEMPORELS ---
-        st.markdown("#### Évolution de l'activité (24h)")
-        hours = list(range(24))
-        activity_data = pd.DataFrame({
-            "Heure": hours,
-            "Requêtes": np.random.randint(100, 500, 24),
-            "Risques": np.random.randint(0, 50, 24)
-        })
-        fig_line = px.line(activity_data, x="Heure", y=["Requêtes", "Risques"], 
-                          color_discrete_sequence=["#00f5c4", "#ff4757"],
-                          template="plotly_dark")
-        fig_line.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
-                              height=300, margin=dict(t=20, b=20, l=20, r=20))
-        st.plotly_chart(fig_line, use_container_width=True)
-
-        st.markdown("<br>",unsafe_allow_html=True)
-        cl,cr = st.columns(2)
-        with cl:
-            fig1=go.Figure(go.Pie(labels=["Normal","DoS","Probe","R2L","U2R"],values=[72,13,9,4,2],hole=0.5,marker=dict(colors=["#00f5c4","#ff4757","#ffa502","#7c6cff","#ff6b6b"])))
-            fig1.update_layout(paper_bgcolor="#111118",font={"color":"#e8e8f0","family":"Syne"},height=290,margin=dict(t=10,b=10),legend=dict(bgcolor="#111118"))
-            st.markdown("#### Repartition des attaques"); st.plotly_chart(fig1,use_container_width=True)
-        with cr:
-            fig2=px.bar(x=["Grippe","Gastro","Migraine","Angine","Cardiaque","Autre"],y=[42,28,19,15,7,31],color_discrete_sequence=["#ff6b6b"])
-            fig2.update_layout(paper_bgcolor="#111118",font={"color":"#e8e8f0","family":"Syne"},height=290,margin=dict(t=10,b=10),xaxis={"gridcolor":"#1e1e2e","title":""},yaxis={"gridcolor":"#1e1e2e","title":"Nb cas"},showlegend=False)
-            st.markdown("#### Diagnostics cette semaine"); st.plotly_chart(fig2,use_container_width=True)
-        if st.session_state.historique:
-            st.markdown("#### Historique de la session")
-            df_hist = pd.DataFrame(st.session_state.historique[::-1])
-            st.dataframe(df_hist,use_container_width=True,hide_index=True)
-            
-            # --- EXPORT CSV ---
-            csv = df_hist.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="📥 Exporter l'historique (CSV)",
-                data=csv,
-                file_name=f"historique_kotighi_{datetime.datetime.now().strftime('%Y%m%d')}.csv",
-                mime='text/csv',
-            )
-        else:
-            st.markdown("<div class='infob'>Aucune analyse effectuee. Lancez une analyse depuis Cybersecurite ou Sante.</div>",unsafe_allow_html=True)
 
     # GESTION
     elif page == "Gestion":
