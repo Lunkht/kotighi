@@ -420,7 +420,15 @@ def app():
                 """, unsafe_allow_html=True)
 
         with c2:
-            st_lottie(lottie_scan, height=400, key="hero_anim")
+            if lottie_scan:
+                st_lottie(lottie_scan, height=400, key="hero_anim")
+            else:
+                # Fallback visuel si l'animation ne charge pas
+                st.markdown("""
+                <div style='background:rgba(0,245,196,0.05);border-radius:50%;width:300px;height:300px;display:flex;align-items:center;justify-content:center;margin:auto;border:2px solid rgba(0,245,196,0.2)'>
+                    <div style='font-size:5rem'>🛡️</div>
+                </div>
+                """, unsafe_allow_html=True)
 
         st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("### 🚀 Modules disponibles")
@@ -490,13 +498,19 @@ def app():
                     type_att="Normal"
                     st.toast("✅ Connexion normale détectée", icon="🟢")
                     col_a, col_b = st.columns([1, 4])
-                    with col_a: st_lottie(lottie_success, height=60, key="ok_c")
+                    if lottie_success:
+                        with col_a: st_lottie(lottie_success, height=60, key="ok_c")
+                    else:
+                        with col_a: st.markdown("✅")
                     with col_b: st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
                 else:
                     type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
                     st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
                     col_a, col_b = st.columns([1, 4])
-                    with col_a: st_lottie(lottie_alert, height=60, key="warn_c")
+                    if lottie_alert:
+                        with col_a: st_lottie(lottie_alert, height=60, key="warn_c")
+                    else:
+                        with col_a: st.markdown("🚨")
                     with col_b: st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
                 
                 fig = go.Figure(go.Indicator(mode="gauge+number",value=proba_moy[1]*100,
