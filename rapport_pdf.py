@@ -264,8 +264,9 @@ def generer_rapport_sante(data: dict) -> bytes:
     y -= 20
     _titre_section(c, y, "Symptomes observes", C_HEALTH)
     y -= 22
-    ALL_SYM = ["Fievre","Toux","Fatigue","Maux de tete","Douleur gorge",
-               "Nausees","Douleur thoracique","Essoufflement","Diarrhee","Frissons"]
+    ALL_SYM = ["Fièvre","Toux","Fatigue","Maux de tête","Maux de gorge",
+               "Nausées","Douleur thoracique","Essoufflement","Diarrhée","Frissons",
+               "Perte odorat", "Douleurs musculaires", "Palpitations", "Vertiges"]
     col_x = [50, W//2 + 10]
     row_h = 20
     for idx, sym in enumerate(ALL_SYM):

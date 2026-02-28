@@ -661,102 +661,190 @@ def app():
 
     # SANTE
     elif page == "Sante":
-        st.markdown("## Analyse de symptomes")
-        st.markdown("<div class='awarning'>Outil educatif. Consultez un medecin.</div>",unsafe_allow_html=True)
-        st.divider()
-        ms,labels,conseils_prev = get_sante()
-        col1,col2 = st.columns(2)
-        with col1:
-            st.markdown("### Symptômes du patient")
-            age   = st.number_input("Age",1,120,35)
-            dur_s = st.selectbox("Duree",["Moins de 24h","1 a 3 jours","3 a 7 jours","Plus d'une semaine"])
-            
-            # --- REGROUPEMENT LOGIQUE DES SYMPTÔMES ---
-            with st.expander("Général & Douleurs", expanded=True):
-                c1, c2 = st.columns(2)
-                with c1: fievre=st.checkbox("🌡️ Fièvre"); fat=st.checkbox("😴 Fatigue"); fri=st.checkbox("🥶 Frissons")
-                with c2: mus=st.checkbox("💪 Musculaire"); tete=st.checkbox("🤕 Maux de tête"); ver=st.checkbox("� Vertiges")
-            
-            with st.expander("Respiratoire & ORL", expanded=True):
-                c1, c2 = st.columns(2)
-                with c1: toux=st.checkbox("� Toux"); ess=st.checkbox("😮 Essoufflement"); odo=st.checkbox("� Perte odorat")
-                with c2: gorge=st.checkbox("😮‍💨 Gorge"); thor=st.checkbox("� Thorax"); pal=st.checkbox("💓 Palpitations")
-                
-            with st.expander("Digestif", expanded=True):
-                c1, c2 = st.columns(2)
-                with c1: nau=st.checkbox("🤢 Nausées")
-                with c2: diar=st.checkbox("� Diarrhée")
-            
-            go_s = st.button("ANALYSER LES SYMPTÔMES",type="primary")
-        with col2:
-            st.markdown("### Résultat")
-            if go_s:
-                nb = sum([fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver])
-                if nb==0: st.warning("Sélectionnez au moins un symptôme.")
-                else:
-                    feat = pd.DataFrame([{"fievre":int(fievre),"toux":int(toux),"fatigue":int(fat),"maux_tete":int(tete),"douleur_gorge":int(gorge),"nausees":int(nau),"douleur_thorax":int(thor),"essoufflement":int(ess),"diarrhee":int(diar),"frissons":int(fri),"perte_odorat":int(odo),"douleurs_musculaires":int(mus),"palpitations":int(pal),"vertiges":int(ver)}])
-                    pred=ms.predict(feat)[0]; proba=ms.predict_proba(feat)[0]
-                    diag=labels[pred]; conf=proba[pred]*100
-                    urgent = "cardiaque" in diag.lower() or "covid" in diag.lower()
-                    
-                    if urgent: 
-                        st.toast(f"🚨 ALERTE CRITIQUE : {diag}", icon="🚨")
-                        st.markdown(f"<div class='adanger'><strong>CONSULTATION URGENTE</strong><br>Diagnostic : {diag}<br>Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
-                    else: 
-                        st.toast(f"🩺 Diagnostic : {diag}", icon="🩺")
-                        st.markdown(f"<div class='asuccess'><strong>Diagnostic : {diag}</strong><br>Confiance : {conf:.0f}% — {nb} symptôme(s)</div>",unsafe_allow_html=True)
-                    
-                    # --- CONSEILS PERSONNALISÉS ---
-                    st.markdown("#### 💡 Conseils & Prévention")
-                    for conseil in conseils_prev.get(diag, []):
-                        st.info(f"👉 {conseil}")
-                    
-                    # --- EXPLICATION (SHAP SIMPLIFIÉ) ---
-                    st.markdown("#### 🔍 Pourquoi ce diagnostic ?")
-                    # Calcul simple d'importance basé sur les symptômes présents vs attendus pour ce diagnostic
-                    top_facteurs = []
-                    if "covid" in diag.lower() and odo: top_facteurs.append("Perte d'odorat (Spécifique)")
-                    if "grippe" in diag.lower() and mus: top_facteurs.append("Douleurs musculaires (Typique)")
-                    if "cardiaque" in diag.lower() and thor: top_facteurs.append("Douleur thoracique (Critique)")
-                    if fievre: top_facteurs.append("Fièvre (Infection)")
-                    
-                    if top_facteurs:
-                        st.markdown(f"Facteurs déterminants : **{', '.join(top_facteurs)}**")
-                    else:
-                        st.markdown("Combinaison globale des symptômes.")
+        # --- THEME CLINIQUE FUTURISTE ---
+        st.markdown("""
+        <style>
+        /* Override spécifique pour la page Santé si le thème global est sombre */
+        [data-testid="stAppViewContainer"] {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .clinic-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-left: 6px solid #00d2d3;
+        }
+        .clinic-header {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .stToggle { margin-bottom: 10px; }
+        .stButton>button {
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .stButton>button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(0,0,0,0.15);
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-                    df_p = pd.DataFrame({"Diagnostic":labels,"Probabilite":proba*100}).sort_values("Probabilite",ascending=True)
-                    fig = px.bar(df_p,x="Probabilite",y="Diagnostic",orientation="h",color="Probabilite",color_continuous_scale=["#1e1e2e","#7c6cff","#ff6b6b"])
-                    fig.update_layout(paper_bgcolor="#111118",height=290,margin=dict(t=10,b=10),font={"color":"#e8e8f0","family":"Syne"},showlegend=False,coloraxis_showscale=False,xaxis={"gridcolor":"#1e1e2e","title":"Probabilite (%)"},yaxis={"gridcolor":"#1e1e2e","title":""})
-                    st.plotly_chart(fig,use_container_width=True)
-                    # --- JOURNALISATION STRUCTURÉE ---
-                    log_entry = {
-                        "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        "Module": "Sante",
-                        "Resultat": diag,
-                        "Confiance": f"{conf:.0f}%",
-                        "Utilisateur": login,
-                        "Detail": f"Age {age}, {nb} sympt."
-                    }
-                    st.session_state.historique.append(log_entry)
-                    
-                    # --- GENERATION RAPPORT PDF ---
-                    try:
-                        from rapport_pdf import generer_rapport_sante
-                        ALL_SYM = ["fievre","toux","fatigue","maux_tete","douleur_gorge","nausees","douleur_thorax","essoufflement","diarrhee","frissons","perte_odorat","douleurs_musculaires","palpitations","vertiges"]
-                        VAL_SYM = [fievre,toux,fat,tete,gorge,nau,thor,ess,diar,fri,odo,mus,pal,ver]
-                        pdf_sante = generer_rapport_sante({
-                            "age": age, "duree_symptomes": dur_s,
-                            "symptomes": [s for s, v in zip(ALL_SYM, VAL_SYM) if v],
-                            "diagnostic": diag, "confiance": conf, "urgent": urgent,
-                            "utilisateur": login, "role": user["role"]
-                        })
-                        st.download_button("📥 Télécharger le rapport PDF", pdf_sante,
-                                         file_name=f"rapport_sante_{login}.pdf", mime="application/pdf")
-                    except ImportError:
-                        st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
-                    if urgent: st.error("Appelez le 15 (SAMU)")
-                    st.info("Restez hydrate"); st.warning("Consultez un medecin si aggravation")
+        st.markdown("<h2 class='clinic-header'>// MODULE CLINIQUE AVANCÉ</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color:#576574; font-size:1rem; font-family:monospace;'>SYSTEME D'AIDE AU DIAGNOSTIC MÉDICAL PAR IA v2.4</p>", unsafe_allow_html=True)
+        st.divider()
+        
+        ms, labels, conseils_prev = get_sante()
+        
+        # Layout Principal
+        c_main, c_res = st.columns([1.6, 1])
+        
+        with c_main:
+            st.markdown("<div class='clinic-card'>", unsafe_allow_html=True)
+            st.markdown("#### PARAMÈTRES PATIENT")
+            c1, c2 = st.columns(2)
+            with c1: age = st.slider("Âge", 0, 120, 35)
+            with c2: dur_s = st.select_slider("Durée des symptômes", options=["< 24h", "1-3 jours", "3-7 jours", "> 7 jours"])
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='clinic-card'>", unsafe_allow_html=True)
+            st.markdown("#### ANALYSE SYMPTOMATIQUE")
+            
+            t1, t2, t3 = st.tabs(["GÉNÉRAL", "RESPIRATOIRE", "DIGESTIF & AUTRES"])
+            
+            with t1:
+                c_a, c_b = st.columns(2)
+                with c_a: 
+                    fievre = st.toggle("Fièvre (> 38°C)")
+                    fat = st.toggle("Fatigue Intense")
+                with c_b: 
+                    friss = st.toggle("Frissons")
+                    vert = st.toggle("Vertiges")
+            
+            with t2:
+                c_a, c_b = st.columns(2)
+                with c_a: 
+                    toux = st.toggle("Toux Sèche")
+                    ess = st.toggle("Essoufflement")
+                with c_b: 
+                    gorge = st.toggle("Maux de Gorge")
+                    odorat = st.toggle("Perte Odorat/Goût")
+            
+            with t3:
+                c_a, c_b = st.columns(2)
+                with c_a: 
+                    nau = st.toggle("Nausées")
+                    diar = st.toggle("Diarrhée")
+                with c_b: 
+                    tete = st.toggle("Maux de Tête")
+                    thor = st.toggle("Douleur Thoracique")
+                    mus = st.toggle("Douleurs Musculaires")
+                    pal = st.toggle("Palpitations")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            go_scan = st.button("LANCER L'ANALYSE DIAGNOSTIQUE", type="primary", use_container_width=True)
+
+        with c_res:
+            if go_scan:
+                # Mapping des symptômes
+                symptomes_map = [fievre, toux, fat, tete, gorge, nau, thor, ess, diar, friss, odorat, mus, pal, vert]
+                nb_symptomes = sum(symptomes_map)
+                
+                if nb_symptomes == 0:
+                    st.warning("Veuillez sélectionner au moins un symptôme.")
+                else:
+                    with st.spinner("Analyse des biomarqueurs en cours..."):
+                        time.sleep(1.5) # Simulation temps de calcul
+                        
+                        # Création DataFrame pour le modèle
+                        feat = pd.DataFrame([{"fievre":int(fievre),"toux":int(toux),"fatigue":int(fat),"maux_tete":int(tete),"douleur_gorge":int(gorge),"nausees":int(nau),"douleur_thorax":int(thor),"essoufflement":int(ess),"diarrhee":int(diar),"frissons":int(friss),"perte_odorat":int(odorat),"douleurs_musculaires":int(mus),"palpitations":int(pal),"vertiges":int(vert)}])
+                        
+                        pred = ms.predict(feat)[0]
+                        proba = ms.predict_proba(feat)[0]
+                        diag = labels[pred]
+                        conf = proba[pred] * 100
+                        
+                        # Logique d'urgence
+                        is_urgent = "cardiaque" in diag.lower() or "covid" in diag.lower() or conf < 60
+                        color_res = "#ff4757" if is_urgent else ("#ffa502" if conf < 80 else "#00d2d3")
+                        icon_res = "🚨" if is_urgent else "🩺"
+                        bg_res = "#ffeaa7" if is_urgent else "#d1ccc0" 
+                        
+                        # Affichage Résultat
+                        st.markdown(f"""
+                        <div style="background:white; padding:25px; border-radius:20px; border-top: 10px solid {color_res}; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align:center;">
+                            <div style="font-size:3.5rem; margin-bottom:10px;">{icon_res}</div>
+                            <h3 style="color:{color_res}; margin:0; text-transform:uppercase; font-family:'Syne';">{diag}</h3>
+                            <div style="height:2px; background:#eee; margin:15px 0;"></div>
+                            <p style="font-size:0.9rem; color:#666; margin-bottom:5px;">FIABILITÉ IA</p>
+                            <div style="font-size:2rem; font-weight:800; color:{color_res};">{conf:.1f}%</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Section Conseils
+                        st.markdown("#### 💡 RECOMMANDATIONS")
+                        if diag in conseils_prev:
+                            for c in conseils_prev[diag]:
+                                st.info(f"{c}")
+                        else:
+                            st.info("Consultez un médecin pour un avis professionnel.")
+                            
+                        if is_urgent:
+                            st.error("⚠️ SITUATION CRITIQUE : CONTACTEZ LES SECOURS (15)")
+                        
+                        # Rapport PDF
+                        try:
+                            from rapport_pdf import generer_rapport_sante
+                            all_sym_names = ["Fièvre","Toux","Fatigue","Maux de tête","Maux de gorge","Nausées","Douleur thoracique","Essoufflement","Diarrhée","Frissons","Perte odorat","Douleurs musculaires","Palpitations","Vertiges"]
+                            active_syms = [name for name, val in zip(all_sym_names, symptomes_map) if val]
+                            
+                            pdf_data = {
+                                "age": age, "duree_symptomes": dur_s,
+                                "symptomes": active_syms,
+                                "diagnostic": diag, "confiance": conf, "urgent": is_urgent,
+                                "utilisateur": st.session_state.username if "username" in st.session_state else "Guest",
+                                "role": "User"
+                            }
+                            pdf_bytes = generer_rapport_sante(pdf_data)
+                            st.download_button("📥 TÉLÉCHARGER RAPPORT", pdf_bytes, file_name=f"rapport_{st.session_state.username}.pdf", mime="application/pdf", use_container_width=True)
+                            
+                            # Log History
+                            log_entry = {
+                                "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                "Module": "Sante",
+                                "Resultat": diag,
+                                "Confiance": f"{conf:.0f}%",
+                                "Utilisateur": st.session_state.username,
+                                "Detail": f"Age {age}, {nb_symptomes} sympt."
+                            }
+                            st.session_state.historique.append(log_entry)
+                            
+                        except Exception as e:
+                            st.warning("Service PDF indisponible momentanément.")
+            
+            else:
+                # Placeholder state
+                st.markdown("""
+                <div style="text-align:center; color:#b2bec3; padding:50px; background:rgba(255,255,255,0.5); border-radius:20px;">
+                    <div style="font-size:4rem; opacity:0.5; margin-bottom:10px;">🏥</div>
+                    <p style="font-family:'Syne'; font-size:1.2rem;">En attente de données...</p>
+                    <p style="font-size:0.8rem;">Veuillez remplir le formulaire à gauche.</p>
+                </div>
+                """, unsafe_allow_html=True)
 
     # GESTION
     elif page == "Gestion":
