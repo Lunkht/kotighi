@@ -558,7 +558,7 @@ def page_login():
     with col:
         if st.session_state.auth_mode == "Connexion":
             st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>🔐 Connexion</div>
+                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
                 <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Identifiez-vous pour accéder à la plateforme</div>
             </div>""", unsafe_allow_html=True)
             if st.session_state.tentatives >= 5:
