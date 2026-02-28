@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import hashlib, time, datetime
+import hashlib, time, datetime, requests
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
 import plotly.express as px
+from streamlit_lottie import st_lottie
 
 st.set_page_config(page_title="KOTIGHI AI", layout="wide")
 
@@ -169,6 +170,20 @@ def apply_theme():
     </style>""", unsafe_allow_html=True)
 
 apply_theme()
+
+# ── ANIMATIONS LOTTIE ─────────────────────────────────────────────
+def load_lottieurl(url: str):
+    try:
+        r = requests.get(url)
+        if r.status_code != 200: return None
+        return r.json()
+    except: return None
+
+lottie_scan = load_lottieurl("https://lottie.host/6253907c-9b7d-411a-8219-450e82c50257/2j6ZqXy1xS.json") # Radar Scan
+lottie_health = load_lottieurl("https://lottie.host/f9202165-424a-4424-8178-0850c410313c/zT1i8r5e1y.json") # Heartbeat
+lottie_success = load_lottieurl("https://lottie.host/54003058-0051-4034-a69c-29657685600c/S2g4Q5X06e.json") # Checkmark
+lottie_alert = load_lottieurl("https://lottie.host/c528646f-7634-406a-a287-639105437996/gW3s5h8k2f.json") # Warning Triangle
+
 @st.cache_resource
 def get_cyber():
     np.random.seed(42); N=4000
@@ -383,62 +398,69 @@ def app():
         with col2:
             st.markdown("### Résultat")
             if go_c:
-                with st.spinner("Analyse du trafic réseau en cours..."):
-                    time.sleep(1.2) # Simulation de calcul
-                    feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
-                    feat_scaled = sc.transform(feat)
-                    
-                    # --- SYSTÈME DE VOTE (RF + GB) ---
-                    p_rf = m_rf.predict_proba(feat_scaled)[0]
-                    p_gb = m_gb.predict_proba(feat_scaled)[0]
-                    proba_moy = (p_rf + p_gb) / 2
-                    pred = 1 if proba_moy[1] > 0.5 else 0
-                    conf = max(proba_moy) * 100
-                    
-                    if pred==0:
-                        type_att="Normal"
-                        st.toast("✅ Connexion normale détectée", icon="🟢")
-                        st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
-                    else:
-                        type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
-                        st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
-                        st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
-                    
-                    fig = go.Figure(go.Indicator(mode="gauge+number",value=proba_moy[1]*100,
+                # --- PROGRESS BAR ANIMÉE ---
+                my_bar = st.progress(0, text="Initialisation...")
+                for i, step in enumerate(["Analyse des paquets...", "Scan des signatures...", "Vérification des ports...", "Calcul du score de risque..."]):
+                    time.sleep(0.3)
+                    my_bar.progress((i+1)*25, text=step)
+                time.sleep(0.2); my_bar.empty()
+                
+                feat = pd.DataFrame([{"requetes_min":req,"duree":dur,"octets":oct_,"ports_scanes":ports,"taux_erreur":terr,"flag_suspect":int(flag)}])
+                feat_scaled = sc.transform(feat)
+                
+                # --- SYSTÈME DE VOTE (RF + GB) ---
+                p_rf = m_rf.predict_proba(feat_scaled)[0]
+                p_gb = m_gb.predict_proba(feat_scaled)[0]
+                proba_moy = (p_rf + p_gb) / 2
+                pred = 1 if proba_moy[1] > 0.5 else 0
+                conf = max(proba_moy) * 100
+                
+                if pred==0:
+                    type_att="Normal"
+                    st.toast("✅ Connexion normale détectée", icon="🟢")
+                    col_a, col_b = st.columns([1, 4])
+                    with col_a: st_lottie(lottie_success, height=60, key="ok_c")
+                    with col_b: st.markdown(f"<div class='asuccess'><strong>CONNEXION NORMALE</strong><br>Aucune menace — Confiance : {conf:.0f}%</div>",unsafe_allow_html=True)
+                else:
+                    type_att = "DoS/DDoS" if req>2000 else ("Scan de ports" if ports>30 else ("Brute Force" if terr>0.7 else "Activite suspecte"))
+                    st.toast(f"🚨 ATTAQUE DÉTECTÉE : {type_att}", icon="🔴")
+                    col_a, col_b = st.columns([1, 4])
+                    with col_a: st_lottie(lottie_alert, height=60, key="warn_c")
+                    with col_b: st.markdown(f"<div class='adanger'><strong>ATTAQUE — {type_att}</strong><br>Confiance : {conf:.0f}% — IP : {ip}</div>",unsafe_allow_html=True)
+                
+                fig = go.Figure(go.Indicator(mode="gauge+number",value=proba_moy[1]*100,
                         title={"text":"Score de Risque","font":{"color":"#e8e8f0","family":"Syne"}},
                         gauge={"axis":{"range":[0,100]},"bar":{"color":"#ff4757" if pred==1 else "#00f5c4"},"bgcolor":"#111118","bordercolor":"#1e1e2e",
                                "steps":[{"range":[0,30],"color":"rgba(0,245,196,.1)"},{"range":[30,60],"color":"rgba(255,165,0,.1)"},{"range":[60,100],"color":"rgba(255,71,87,.1)"}]},
                         number={"font":{"color":"#e8e8f0"},"suffix":"%"}))
-                    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
-                    st.plotly_chart(fig,use_container_width=True)
-                    
-                    # --- JOURNALISATION STRUCTURÉE ---
-                    log_entry = {
-                        "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        "Module": "Cybersecurite",
-                        "IP": ip,
-                        "Resultat": type_att,
-                        "Confiance": f"{conf:.0f}%",
-                        "Utilisateur": login,
-                        "Score": f"{proba_moy[1]*100:.1f}%"
-                    }
-                    st.session_state.historique.append(log_entry)
-                    
-                    # --- GENERATION RAPPORT PDF ---
-                    try:
-                        from rapport_pdf import generer_rapport_cyber
-                        pdf_cyber = generer_rapport_cyber({
-                            "ip": ip, "requetes": req, "duree": dur,
-                            "octets": oct_, "ports": ports, "taux_erreur": terr,
-                            "prediction": pred, "type_attaque": type_att, "confiance": conf,
-                            "utilisateur": login, "role": user["role"]
-                        })
-                        st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
-                                         file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
-                    except ImportError:
-                        st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
-                if pred==1: st.error("Bloquer l'IP source"); st.warning("Analyser les logs")
-                else: st.success("Connexion autorisee")
+                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)",height=260,margin=dict(t=40,b=0,l=20,r=20),font={"color":"#e8e8f0"})
+                st.plotly_chart(fig,use_container_width=True)
+                
+                # --- JOURNALISATION STRUCTURÉE ---
+                log_entry = {
+                    "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "Module": "Cybersecurite",
+                    "IP": ip,
+                    "Resultat": type_att,
+                    "Confiance": f"{conf:.0f}%",
+                    "Utilisateur": login,
+                    "Score": f"{proba_moy[1]*100:.1f}%"
+                }
+                st.session_state.historique.append(log_entry)
+                
+                # --- GENERATION RAPPORT PDF ---
+                try:
+                    from rapport_pdf import generer_rapport_cyber
+                    pdf_cyber = generer_rapport_cyber({
+                        "ip": ip, "requetes": req, "duree": dur,
+                        "octets": oct_, "ports": ports, "taux_erreur": terr,
+                        "prediction": pred, "type_attaque": type_att, "confiance": conf,
+                        "utilisateur": login, "role": user["role"]
+                    })
+                    st.download_button("📥 Télécharger le rapport PDF", pdf_cyber,
+                                        file_name=f"rapport_cyber_{ip}.pdf", mime="application/pdf")
+                except ImportError:
+                    st.info("Module 'rapport_pdf' non trouvé. La génération PDF est désactivée.")
 
     # SANTE
     elif page == "Sante":

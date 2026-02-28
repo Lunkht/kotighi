@@ -9,3 +9,4 @@ cryptography
 fastapi
 uvicorn
 pydantic
+streamlit-lottie
