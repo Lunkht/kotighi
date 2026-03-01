@@ -694,57 +694,30 @@ def app():
         
         st.markdown("<br>",unsafe_allow_html=True)
         
-        # CHARTS + QUICK ACCESS
-        cl,cr = st.columns([2, 1])
-        
-        with cl:
-            st.markdown("#### 📈 Activité Temps Réel (24h)")
-            hours = list(range(24))
-            activity_data = pd.DataFrame({
-                "Heure": hours,
-                "Requêtes": np.random.randint(100, 500, 24),
-                "Menaces": np.random.randint(0, 50, 24)
-            })
-            fig_line = go.Figure()
-            fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Requêtes"], name="Requêtes",
-                line=dict(color="#00E5FF", width=2), fill="tozeroy",
-                fillcolor="rgba(0,229,255,0.05)"))
-            fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Menaces"], name="Menaces",
-                line=dict(color="#EF4444", width=2), fill="tozeroy",
-                fillcolor="rgba(239,68,68,0.05)"))
-            fig_line.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                height=320, margin=dict(t=20, b=30, l=40, r=20),
-                legend=dict(orientation="h", y=1.12, font=dict(family="JetBrains Mono", size=11)),
-                xaxis=dict(showgrid=False, color="#64748B", title=None),
-                yaxis=dict(showgrid=True, gridcolor="rgba(28, 31, 46, 0.12)", color="#64748B", title=None),
-                font=dict(family="Inter", color="#64748B")
-            )
-            st.plotly_chart(fig_line, use_container_width=True)
-
-        with cr:
-            st.markdown("#### 🚀 Accès Rapide")
-            if "Cybersecurite" in user["acces"]:
-                st.markdown("""
-                <div class='feature-card' style='margin-bottom:12px'>
-                    <div style='margin-bottom:8px'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <div style='font-weight:700;color:#00E5FF;margin-bottom:4px;font-size:.95rem'>Module Cyber</div>
-                    <div class='k-subtext' style='font-size:.8rem'>Lancer un scan réseau</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            if "Sante" in user["acces"]:
-                st.markdown("""
-                <div class='feature-card'>
-                    <div style='margin-bottom:8px'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                    </div>
-                    <div style='font-weight:700;color:#8B5CF6;margin-bottom:4px;font-size:.95rem'>Module Santé</div>
-                    <div class='k-subtext' style='font-size:.8rem'>Nouveau diagnostic</div>
-                </div>
-                """, unsafe_allow_html=True)
+        # CHARTS
+        st.markdown("#### 📈 Activité Temps Réel (24h)")
+        hours = list(range(24))
+        activity_data = pd.DataFrame({
+            "Heure": hours,
+            "Requêtes": np.random.randint(100, 500, 24),
+            "Menaces": np.random.randint(0, 50, 24)
+        })
+        fig_line = go.Figure()
+        fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Requêtes"], name="Requêtes",
+            line=dict(color="#00E5FF", width=2), fill="tozeroy",
+            fillcolor="rgba(0,229,255,0.05)"))
+        fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Menaces"], name="Menaces",
+            line=dict(color="#EF4444", width=2), fill="tozeroy",
+            fillcolor="rgba(239,68,68,0.05)"))
+        fig_line.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            height=320, margin=dict(t=20, b=30, l=40, r=20),
+            legend=dict(orientation="h", y=1.12, font=dict(family="JetBrains Mono", size=11)),
+            xaxis=dict(showgrid=False, color="#64748B", title=None),
+            yaxis=dict(showgrid=True, gridcolor="rgba(28, 31, 46, 0.12)", color="#64748B", title=None),
+            font=dict(family="Inter", color="#64748B")
+        )
+        st.plotly_chart(fig_line, use_container_width=True)
 
         st.markdown("<br>",unsafe_allow_html=True)
         
