@@ -561,7 +561,7 @@ def page_login():
             """, unsafe_allow_html=True)
             
             if st.session_state.tentatives >= 5:
-                st.error("⛔ Trop de tentatives. Compte bloqué.")
+                st.error("Trop de tentatives. Compte bloqué.")
                 st.markdown("</div>", unsafe_allow_html=True)
                 return
             
@@ -629,6 +629,12 @@ def page_login():
         if mode != st.session_state.auth_mode:
             st.session_state.auth_mode = mode
             st.rerun()
+
+        # LOGO SOUS LE SWITCH
+        st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
+        # Centrage du logo via une div wrapper si nécessaire, mais get_logo_html renvoie un svg width=100%
+        # On va le restreindre un peu en largeur pour qu'il ne soit pas énorme
+        st.markdown(f"<div style='width: 120px; margin: 0 auto;'>{get_logo_html('#E2E8F0' if st.session_state.theme == 'Sombre' else '#1E293B')}</div>", unsafe_allow_html=True)
 
         # INFO COMPTES DEMO (INTÉGRÉ DANS LA COLONNE)
         st.markdown("""<div style='margin-top:24px;text-align:center'>
@@ -985,12 +991,16 @@ def app():
                         # Logique d'urgence
                         is_urgent = "cardiaque" in diag.lower() or "covid" in diag.lower() or conf < 60
                         color_res = "#EF4444" if is_urgent else ("#F59E0B" if conf < 80 else "#10B981")
-                        icon_res = "🚨" if is_urgent else "🩺"
+                        
+                        # SVG Icons
+                        svg_alert = """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>"""
+                        svg_health = """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5 9.04 11l6.22-2.22a.56.56 0 0 1 .63.95l-5.63 3.4L15 18"/></svg>"""
+                        icon_res = svg_alert if is_urgent else svg_health
                         
                         # Affichage Résultat
                         st.markdown(f"""
                         <div class='k-card' style='border-top:3px solid {color_res};text-align:center;padding:30px'>
-                            <div style='font-size:3.5rem;margin-bottom:12px'>{icon_res}</div>
+                            <div style='margin-bottom:12px;color:{color_res}'>{icon_res}</div>
                             <h3 style='color:{color_res};margin:0;text-transform:uppercase;font-weight:800'>{diag}</h3>
                             <div style='height:1px;background:#1C1F2E;margin:16px 0'></div>
                             <div class='k-label' style='margin-bottom:6px'>FIABILITÉ IA</div>
