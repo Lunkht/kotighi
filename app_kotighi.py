@@ -1089,7 +1089,10 @@ def app():
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
-    st.session_state.theme = st.sidebar.selectbox("Thème", ["Sombre", "Clair"], index=0 if st.session_state.theme == "Sombre" else 1)
+    # On masque la sidebar sur la page de login
+    st.markdown("""<style>
+    [data-testid="stSidebar"] { display: none; }
+    </style>""", unsafe_allow_html=True)
     apply_theme()
     page_login()
 else:
