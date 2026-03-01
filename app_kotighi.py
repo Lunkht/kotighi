@@ -395,9 +395,8 @@ def page_login():
     # Header central
     st.markdown(f"""
         <div style='text-align: center; padding-top: 10vh; margin-bottom: 2rem;'>
-            <div style='width: 80px; margin: 0 auto 1rem;'>{get_logo_html('#00E5FF')}</div>
-            <h1 style='font-size: 2.2rem !important; margin-bottom: 0;'>KOTIGHI AI</h1>
-            <p style='color: #64748B; font-weight: 500; letter-spacing: 1px; font-size: 0.8rem;'>PLATEFORME D'INTELLIGENCE ANALYTIQUE</p>
+            <div style='width: 150px; margin: 0 auto 1rem;'>{get_logo_html('#00E5FF')}</div>
+            <p style='color: #64748B; font-weight: 500; letter-spacing: 1.5px; font-size: 0.75rem; text-transform: uppercase;'>Plateforme d'Intelligence Analytique</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -476,7 +475,8 @@ def page_login():
                 <span class='k-badge' style='font-size: 0.6rem; opacity: 0.8;'>SÉCURISÉ PAR KOTIGHI SHIELD v3.0</span>
                 <p style='color: #64748B; font-family: "JetBrains Mono", monospace; font-size: 0.72rem; margin-top: 1.5rem; line-height: 1.6;'>
                     DEMO : <span style='color: #00E5FF;'>admin</span> / kotighi2024 &nbsp;•&nbsp; 
-                    <span style='color: #00E5FF;'>analyste</span> / analyse123
+                    <span style='color: #00E5FF;'>analyste</span> / analyse123 &nbsp;•&nbsp; 
+                    <span style='color: #00E5FF;'>medecin</span> / sante456
                 </p>
             </div>
         """, unsafe_allow_html=True)
