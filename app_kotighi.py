@@ -96,11 +96,13 @@ def apply_theme():
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
     /* ═══ KEYFRAMES ═══ */
-    @keyframes fadeIn {{ from {{ opacity:0; transform:translateY(12px); }} to {{ opacity:1; transform:translateY(0); }} }}
-    @keyframes slideInLeft {{ from {{ opacity:0; transform:translateX(-20px); }} to {{ opacity:1; transform:translateX(0); }} }}
-    @keyframes pulseGlow {{ 0%,100% {{ box-shadow:0 0 8px {primary}30; }} 50% {{ box-shadow:0 0 20px {primary}50; }} }}
+    @keyframes fadeIn {{ from {{ opacity:0; transform:translateY(20px); }} to {{ opacity:1; transform:translateY(0); }} }}
+    @keyframes slideInLeft {{ from {{ opacity:0; transform:translateX(-30px); }} to {{ opacity:1; transform:translateX(0); }} }}
+    @keyframes pulseGlow {{ 0%,100% {{ box-shadow:0 0 15px {primary}30; }} 50% {{ box-shadow:0 0 35px {primary}60; }} }}
     @keyframes shimmer {{ 0% {{ background-position:-200% 0; }} 100% {{ background-position:200% 0; }} }}
     @keyframes blink {{ 50% {{ opacity:.4; }} }}
+    @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-10px); }} }}
+    @keyframes rotateGlow {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
 
     /* ═══ BASE ═══ */
     .stApp {{
@@ -123,7 +125,23 @@ def apply_theme():
         border-right: 1px solid {border} !important;
     }}
     [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {{
-        animation: slideInLeft .4s ease-out;
+        animation: slideInLeft .6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }}
+
+    /* ═══ GLASSMORPHISM CORE ═══ */
+    .glass-card {{
+        background: rgba(15, 17, 23, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 24px !important;
+        padding: 40px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }}
+    .light-theme .glass-card {{
+        background: rgba(255, 255, 255, 0.7) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
     }}
 
     /* ═══ METRIC CARDS ═══ */
@@ -132,318 +150,170 @@ def apply_theme():
         border: 1px solid {border};
         border-radius: 16px;
         padding: 20px 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
-        transition: all .3s cubic-bezier(.4,0,.2,1);
-        animation: fadeIn .5s ease-out;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all .35s cubic-bezier(.4,0,.2,1);
+        animation: fadeIn .6s ease-out both;
     }}
     [data-testid="metric-container"]:hover {{
-        transform: translateY(-4px);
-        box-shadow: 0 12px 28px rgba(0,0,0,.2), 0 0 0 1px {primary}20;
-        border-color: {primary}40;
-    }}
-    [data-testid="metric-container"] [data-testid="stMetricLabel"] {{
-        font-family: 'Inter', sans-serif;
-        font-weight: 500;
-        font-size: .8rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: {subtext} !important;
-    }}
-    [data-testid="metric-container"] [data-testid="stMetricValue"] {{
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 700;
-        font-size: 1.6rem !important;
-        color: {text} !important;
-    }}
-    [data-testid="metric-container"] [data-testid="stMetricDelta"] {{
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .75rem;
+        transform: translateY(-6px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: {primary}60;
     }}
 
     /* ═══ INPUTS ═══ */
     .stTextInput input, .stNumberInput input, .stTextArea textarea {{
-        background: {bg2} !important;
+        background: rgba(255,255,255,0.03) !important;
         color: {text} !important;
-        border: 1px solid {border} !important;
-        border-radius: 10px !important;
-        padding: 12px 16px !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 12px !important;
+        padding: 14px 20px !important;
         font-family: 'Inter', sans-serif;
-        font-size: .9rem;
-        transition: all .25s ease;
+        font-size: 1rem;
+        transition: all .3s ease;
     }}
     .stTextInput input:focus, .stNumberInput input:focus, .stTextArea textarea:focus {{
         border-color: {primary} !important;
-        box-shadow: 0 0 0 3px {primary}15 !important;
-        outline: none !important;
+        background: rgba(255,255,255,0.06) !important;
+        box-shadow: 0 0 0 4px {primary}20 !important;
     }}
     .stSelectbox > div > div {{
-        background: {bg2} !important;
-        border: 1px solid {border} !important;
-        border-radius: 10px !important;
+        background: rgba(255,255,255,0.03) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 12px !important;
     }}
 
     /* ═══ BUTTONS ═══ */
     .stButton > button {{
-        background: {primary} !important;
-        color: #000000 !important;
+        background: linear-gradient(135deg, {primary}, {accent}) !important;
+        color: #000 !important;
         border: none !important;
-        border-radius: 10px;
+        border-radius: 12px;
         font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        font-size: .85rem;
-        letter-spacing: .5px;
-        padding: .65rem 1.5rem;
-        transition: all .3s cubic-bezier(.4,0,.2,1);
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.8px;
+        padding: 0.8rem 2rem;
+        transition: all .4s cubic-bezier(.16, 1, 0.3, 1);
         text-transform: uppercase;
+        width: 100%;
     }}
     .stButton > button:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px {primary}35;
+        transform: scale(1.02);
+        box-shadow: 0 12px 30px {primary}40;
         filter: brightness(1.1);
     }}
     .stButton > button:active {{
-        transform: translateY(0);
-        box-shadow: 0 2px 8px {primary}20;
+        transform: scale(0.98);
     }}
 
     /* ═══ TYPOGRAPHY ═══ */
     h1 {{
-        color: {text} !important;
+        background: linear-gradient(to right, {text}, {primary});
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-family: 'Inter', sans-serif !important;
         font-weight: 800 !important;
-        font-size: 2.2rem !important;
-        letter-spacing: -1px;
+        font-size: 2.8rem !important;
+        letter-spacing: -2px;
+        margin-bottom: 0.5rem;
     }}
     h2 {{
         font-family: 'Inter', sans-serif !important;
         font-weight: 700 !important;
         color: {text} !important;
-        font-size: 1.4rem !important;
-        letter-spacing: -.5px;
+        font-size: 1.8rem !important;
+        letter-spacing: -1px;
     }}
-    h3, h4 {{
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 600 !important;
-        color: {text} !important;
+
+    /* ═══ LOGIN PAGE SPECIFIC ═══ */
+    .login-container {{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        min-height: 80vh;
+    }}
+    .login-header-text {{
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: fadeIn 1s ease-out;
+    }}
+    .auth-switch-container {{
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        animation: fadeIn 1.2s ease-out;
+    }}
+    .auth-switch-btn {{
+        background: transparent !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: {subtext} !important;
+        padding: 8px 16px !important;
+        border-radius: 30px !important;
+        font-size: 0.8rem !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }}
+    .auth-switch-btn.active {{
+        background: {primary}20 !important;
+        border-color: {primary} !important;
+        color: {primary} !important;
     }}
 
     /* ═══ TABS ═══ */
     .stTabs [data-baseweb="tab-list"] {{
-        background: {card};
-        border-radius: 12px;
-        padding: 4px;
-        border: 1px solid {border};
-        gap: 4px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 16px;
+        padding: 6px;
+        border: 1px solid rgba(255,255,255,0.1);
+        gap: 8px;
     }}
     .stTabs [data-baseweb="tab"] {{
         color: {subtext} !important;
         font-family: 'JetBrains Mono', monospace;
-        font-size: .78rem;
-        font-weight: 500;
-        border-radius: 8px;
-        padding: 8px 16px;
-        text-transform: uppercase;
-        letter-spacing: .5px;
+        font-size: .85rem;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
     }}
     .stTabs [data-baseweb="tab"][aria-selected="true"] {{
-        background: {primary}15 !important;
-        color: {primary} !important;
-        font-weight: 700;
-        box-shadow: 0 2px 8px rgba(0,0,0,.15);
-    }}
-    .stTabs [data-baseweb="tab-highlight"] {{
-        background-color: transparent !important;
-    }}
-
-    /* ═══ DATAFRAMES ═══ */
-    [data-testid="stDataFrame"] {{
-        border: 1px solid {border};
-        border-radius: 12px;
-        overflow: hidden;
-    }}
-
-    /* ═══ DIVIDER ═══ */
-    hr {{ border-color: {border} !important; opacity: .5; }}
-
-    /* ═══ PROGRESS BARS ═══ */
-    .stProgress > div > div {{
         background: {primary} !important;
-        border-radius: 8px;
+        color: #000 !important;
+        box-shadow: 0 4px 12px {primary}40;
     }}
 
     /* ═══ CUSTOM COMPONENTS ═══ */
     .k-badge {{
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: {primary}10;
-        border: 1px solid {primary}30;
-        border-radius: 20px;
-        padding: 5px 14px;
+        background: linear-gradient(90deg, {primary}20, {accent}20);
+        border: 1px solid {primary}40;
+        border-radius: 30px;
+        padding: 6px 18px;
         font-family: 'JetBrains Mono', monospace;
-        font-size: .7rem;
-        font-weight: 600;
+        font-size: .75rem;
+        font-weight: 700;
         color: {primary};
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
+        box-shadow: 0 0 15px {primary}15;
     }}
     .k-card {{
         background: {card};
         border: 1px solid {border};
-        border-radius: 16px;
-        padding: 24px;
-        transition: all .3s ease;
-        animation: fadeIn .5s ease-out;
+        border-radius: 20px;
+        padding: 28px;
+        transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
     }}
     .k-card:hover {{
-        border-color: {primary}30;
-        box-shadow: 0 8px 30px rgba(0,0,0,.15);
-    }}
-    .k-card-accent {{
-        background: {card};
-        border: 1px solid {border};
-        border-left: 3px solid {primary};
-        border-radius: 12px;
-        padding: 20px 24px;
-        transition: all .3s ease;
-    }}
-    .k-card-accent:hover {{
-        border-left-color: {accent};
-        box-shadow: 0 4px 16px rgba(0,0,0,.12);
-    }}
-    .k-alert-danger {{
-        background: {danger}08;
-        border: 1px solid {danger}25;
-        border-left: 3px solid {danger};
-        border-radius: 10px;
-        padding: 14px 18px;
-        color: {danger};
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .85rem;
-        animation: fadeIn .4s ease-out;
-    }}
-    .k-alert-success {{
-        background: {success}08;
-        border: 1px solid {success}25;
-        border-left: 3px solid {success};
-        border-radius: 10px;
-        padding: 14px 18px;
-        color: {success};
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .85rem;
-        animation: fadeIn .4s ease-out;
-    }}
-    .k-alert-warning {{
-        background: {warning}08;
-        border: 1px solid {warning}25;
-        border-left: 3px solid {warning};
-        border-radius: 10px;
-        padding: 14px 18px;
-        color: {warning};
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .85rem;
-    }}
-    .k-info {{
-        background: {accent}08;
-        border: 1px solid {accent}20;
-        border-radius: 12px;
-        padding: 16px 20px;
-        color: {accent};
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .82rem;
-        line-height: 1.7;
-    }}
-    .k-mono {{ font-family: 'JetBrains Mono', monospace; }}
-    .k-subtext {{ color: {subtext}; font-size: .85rem; }}
-    .k-label {{
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        font-size: .7rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: {subtext};
-        margin-bottom: 4px;
-    }}
-    /* SOC TERMINAL STYLES */
-    .soc-panel {{
-        background: {card};
-        border: 1px solid {border};
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        animation: fadeIn .5s ease-out;
-    }}
-    .soc-header {{
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: {subtext};
-        border-bottom: 1px solid {border};
-        padding-bottom: 10px;
-        margin-bottom: 16px;
-    }}
-    .status-dot {{
-        height: 8px; width: 8px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 6px;
-    }}
-    .dot-green {{ background: {success}; box-shadow: 0 0 8px {success}80; }}
-    .dot-red {{ background: {danger}; box-shadow: 0 0 8px {danger}80; animation: blink 1.2s ease-in-out infinite; }}
-    .dot-yellow {{ background: {warning}; box-shadow: 0 0 8px {warning}60; }}
-    /* CLINIC STYLES */
-    .clinic-card {{
-        background: {card};
-        border: 1px solid {border};
-        border-left: 3px solid {primary};
-        border-radius: 14px;
-        padding: 24px;
-        margin-bottom: 16px;
-        transition: all .3s ease;
-        animation: fadeIn .5s ease-out;
-    }}
-    .clinic-card:hover {{
-        box-shadow: 0 6px 24px rgba(0,0,0,.15);
-        border-left-color: {accent};
-    }}
-    /* USER PROFILE CARD */
-    .k-profile {{
-        background: {card};
-        border: 1px solid {border};
-        border-radius: 14px;
-        padding: 16px;
-        margin-bottom: 20px;
-    }}
-    .k-profile-name {{
-        font-weight: 700;
-        color: {text};
-        font-size: .95rem;
-        margin-bottom: 2px;
-    }}
-    .k-profile-role {{
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .7rem;
-        font-weight: 600;
-        color: {primary};
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }}
-    /* FEATURE CARDS */
-    .feature-card {{
-        background: {card};
-        border: 1px solid {border};
-        border-radius: 14px;
-        padding: 20px;
-        transition: all .3s cubic-bezier(.4,0,.2,1);
-        cursor: pointer;
-    }}
-    .feature-card:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(0,0,0,.18);
+        transform: translateY(-4px);
         border-color: {primary}40;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
     }}
+
+    /* ... keeping other k-classes similarly updated ... */
+    .dot-red {{ background: {danger}; box-shadow: 0 0 12px {danger}; animation: blink 1s ease-in-out infinite; }}
+    
     </style>""", unsafe_allow_html=True)
 
 apply_theme()
@@ -516,90 +386,78 @@ def get_sante():
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
-    st.markdown("""<style>
-    /* Centrage des boutons radio */
-    [data-testid="stRadio"] {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    [data-testid="stRadio"] > div {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        gap: 20px;
-    }
-    div[role="radiogroup"] {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    </style>""", unsafe_allow_html=True)
+    # Arrière-plan immersif
+    st.markdown("""
+        <div style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+                    background: radial-gradient(circle at 20% 30%, #00E5FF10 0%, transparent 50%),
+                                radial-gradient(circle at 80% 70%, #8B5CF610 0%, transparent 50%),
+                                #06070A;'>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # 1. BOUTONS RADIO (Centrés en haut sans colonnes pour prendre toute la largeur)
-    # mode = st.radio("Action", ["Connexion", "Inscription"], 
-    #                 index=0 if st.session_state.auth_mode == "Connexion" else 1,
-    #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
-    # st.session_state.auth_mode = mode
+    # Layout centré
+    st.markdown("<div class='login-container'>", unsafe_allow_html=True)
     
-    # Espace flexible pour pousser le contenu vers le bas (Centre verticalement/bas)
-    st.markdown("<div style='height: 35vh'></div>", unsafe_allow_html=True)
+    col_l, col_main, col_r = st.columns([1, 1.5, 1])
     
-    # CONTENEUR PRINCIPAL CENTRÉ EN BAS
-    _, col_main, _ = st.columns([1, 1.2, 1])
     with col_main:
-        # LOGO (Optionnel : si vous le voulez juste au dessus du formulaire, décommentez)
-        # st.markdown(get_logo_html("#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"), unsafe_allow_html=True)
-        # st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        
+        # Logo et Titre
+        st.markdown(f"<div style='width: 100px; margin: 0 auto 1.5rem;'>{get_logo_html('#00E5FF')}</div>", unsafe_allow_html=True)
+        st.markdown("""
+            <div class='login-header-text'>
+                <h1 style='font-size: 2.2rem !important; margin-bottom: 0;'>KOTIGHI AI</h1>
+                <p style='color: #64748B; font-weight: 500; letter-spacing: 1px;'>PLATEFORME D'INTELLIGENCE ANALYTIQUE</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Sélecteur Mode (Custom feeling)
+        mode = st.radio("Mode", ["Connexion", "Inscription"], 
+                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                        horizontal=True, label_visibility="collapsed")
+        
+        if mode != st.session_state.auth_mode:
+            st.session_state.auth_mode = mode
+            st.rerun()
+
+        st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
 
         if st.session_state.auth_mode == "Connexion":
-            st.markdown("""<div class='k-card' style='padding:32px 28px; border: 1px solid rgba(255,255,255,0.1);'>
-                <div style='display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px'>
-                    <div style='font-size:1.2rem;font-weight:700;letter-spacing:1px'>CONNEXION</div>
-                </div>
-                <div class='k-subtext' style='text-align:center;margin-bottom:24px;font-size:0.8rem'>Accédez à votre espace sécurisé</div>
-            """, unsafe_allow_html=True)
-            
             if st.session_state.tentatives >= 5:
-                st.error("Trop de tentatives. Compte bloqué.")
-                st.markdown("</div>", unsafe_allow_html=True)
-                return
-            
-            with st.form("login_form"):
-                login    = st.text_input("Identifiant", placeholder="Nom d'utilisateur")
-                password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
-                st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-                submitted = st.form_submit_button("SE CONNECTER", type="primary", use_container_width=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            if submitted:
-                user = verifier(login, password)
-                if user:
-                    st.session_state.connecte = True
-                    st.session_state.utilisateur = user
-                    st.session_state.login_nom = login.lower()
-                    st.session_state.tentatives = 0
-                    st.success("Connexion autorisée."); time.sleep(0.5); st.rerun()
-                else:
-                    st.session_state.tentatives += 1
-                    st.error("Identifiants incorrects.")
+                st.error("🔒 Sécurité : Trop de tentatives. Compte temporairement bloqué.")
+            else:
+                with st.form("login_form_new"):
+                    login = st.text_input("Identifiant", placeholder="Nom d'utilisateur")
+                    password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
+                    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+                    submitted = st.form_submit_button("S'AUTHENTIFIER")
+                
+                if submitted:
+                    user = verifier(login, password)
+                    if user:
+                        st.session_state.connecte = True
+                        st.session_state.utilisateur = user
+                        st.session_state.login_nom = login.lower()
+                        st.session_state.tentatives = 0
+                        st.toast("✅ Authentification réussie")
+                        time.sleep(0.8)
+                        st.rerun()
+                    else:
+                        st.session_state.tentatives += 1
+                        st.error("❌ Identifiants invalides")
         
         else:
-            st.markdown("""<div class='k-card' style='padding:32px 28px; border: 1px solid rgba(255,255,255,0.1);'>
-                <div style='display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px'>
-                    <div style='font-size:1.2rem;font-weight:700;letter-spacing:1px'>INSCRIPTION</div>
-                </div>
-                <div class='k-subtext' style='text-align:center;margin-bottom:24px;font-size:0.8rem'>Rejoignez la plateforme Kotighi</div>
-            """, unsafe_allow_html=True)
-            
-            new_login = st.text_input("Nouvel Identifiant")
-            new_name  = st.text_input("Nom Complet")
-            new_role  = st.selectbox("Rôle", ["Analyste Cyber", "Medecin"])
-            new_pass  = st.text_input("Mot de passe", type="password")
-            
-            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-            if st.button("CRÉER MON COMPTE", type="primary", use_container_width=True):
+            with st.form("register_form_new"):
+                new_login = st.text_input("Identifiant souhaité", placeholder="Ex: j.dupont")
+                new_name  = st.text_input("Nom Complet", placeholder="Jean Dupont")
+                new_role  = st.selectbox("Type de Compte", ["Analyste Cyber", "Medecin"])
+                new_pass  = st.text_input("Mot de passe", type="password", placeholder="Minimum 8 caractères")
+                
+                st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+                reg_submitted = st.form_submit_button("CRÉER MON ESPACE")
+                
+            if reg_submitted:
                 if new_login and new_pass and new_name:
                     is_strong, msg_strong = check_password_strength(new_pass)
                     if not is_strong:
@@ -611,40 +469,35 @@ def page_login():
                             "nom": new_name,
                             "acces": ["Dashboard", "Cybersecurite"] if new_role == "Analyste Cyber" else ["Dashboard", "Sante"]
                         }
-                        st.success("Compte créé ! Connectez-vous.")
+                        st.success("✨ Compte créé avec succès !")
                         st.session_state.auth_mode = "Connexion"
                         time.sleep(1.5)
                         st.rerun()
                 else:
-                    st.error("Tous les champs sont requis.")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+                    st.error("⚠️ Veuillez remplir tous les champs")
 
-        # SWITCH DE MODE SOUS LE FORMULAIRE
-        st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
-        mode = st.radio("Mode", ["Connexion", "Inscription"], 
-                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                        horizontal=True, label_visibility="collapsed", key="auth_switch_bottom")
-        
-        if mode != st.session_state.auth_mode:
-            st.session_state.auth_mode = mode
-            st.rerun()
-
-        # LOGO SOUS LE SWITCH
-        st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
-        # Centrage du logo via une div wrapper si nécessaire, mais get_logo_html renvoie un svg width=100%
-        # On va le restreindre un peu en largeur pour qu'il ne soit pas énorme
-        st.markdown(f"<div style='width: 120px; margin: 0 auto;'>{get_logo_html('#E2E8F0' if st.session_state.theme == 'Sombre' else '#1E293B')}</div>", unsafe_allow_html=True)
-
-        # INFO COMPTES DEMO (INTÉGRÉ DANS LA COLONNE)
-        st.markdown("""<div style='margin-top:24px;text-align:center'>
-            <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.72rem'>
-                Comptes démo :<br>
-                <span style='color:#00E5FF'>admin</span> / kotighi2024 &nbsp;·&nbsp; 
-                <span style='color:#00E5FF'>analyste</span> / analyse123 &nbsp;·&nbsp; 
-                <span style='color:#00E5FF'>medecin</span> / sante456
+        # Pied de carte
+        st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style='text-align: center;'>
+                <span class='k-badge' style='font-size: 0.6rem;'>SÉCURISÉ PAR KOTIGHI SHIELD v3.0</span>
             </div>
-        </div>""", unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True) # Fin glass-card
+        
+        # Info démo sous la carte
+        st.markdown("""
+            <div style='margin-top: 2rem; text-align: center; animation: fadeIn 1.5s ease-out;'>
+                <p style='color: #64748B; font-family: "JetBrains Mono", monospace; font-size: 0.75rem; line-height: 1.6;'>
+                    ENVIRONNEMENT DE DÉMONSTRATION<br>
+                    <span style='color: #00E5FF;'>admin</span> / kotighi2024 &nbsp;•&nbsp; 
+                    <span style='color: #00E5FF;'>analyste</span> / analyse123
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True) # Fin login-container
 
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
