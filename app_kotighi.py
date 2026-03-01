@@ -895,8 +895,10 @@ def app():
             
             st.markdown("---")
             st.markdown("### Système")
-            st.progress(88, text="CPU")
-            st.progress(45, text="RAM")
+            st.caption("CPU Usage")
+            st.progress(88)
+            st.caption("RAM Usage")
+            st.progress(45)
 
     # ═══════════════════════════════════════════════════════════════
     #  SANTÉ — MODULE CLINIQUE
