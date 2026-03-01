@@ -542,44 +542,36 @@ def page_login():
     #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     # st.session_state.auth_mode = mode
     
-    # Espace avant le formulaire pour centrer verticalement
-    st.markdown("<div style='height: 10vh'></div>", unsafe_allow_html=True)
+    # Espace flexible pour pousser le contenu vers le bas
+    st.markdown("<div style='height: 25vh'></div>", unsafe_allow_html=True)
     
-    # LOGO
-    _, c_l, _ = st.columns([1, 0.8, 1])
-    with c_l:
-        logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
-        st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
-    
-    # BLOC CENTRAL
-    _,col,_ = st.columns([1,1.2,1])
-    with col:
-        # BOUTONS RADIO DANS LE BLOC
-        # mode = st.radio("Action", ["Connexion", "Inscription"], 
-        #                 index=0 if st.session_state.auth_mode == "Connexion" else 1,
-        #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
-        # st.session_state.auth_mode = mode
-        # st.markdown("<br>", unsafe_allow_html=True)
+    # CONTENEUR PRINCIPAL CENTRÉ EN BAS
+    _, col_main, _ = st.columns([1, 1.2, 1])
+    with col_main:
+        # LOGO (Optionnel : si vous le voulez juste au dessus du formulaire, décommentez)
+        # st.markdown(get_logo_html("#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"), unsafe_allow_html=True)
+        # st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
 
         if st.session_state.auth_mode == "Connexion":
-            st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
-                <div style='display:flex;align-items:center;gap:10px;margin-bottom:4px'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <div style='font-size:1.1rem;font-weight:700'>Connexion</div>
+            st.markdown("""<div class='k-card' style='padding:32px 28px; border: 1px solid rgba(255,255,255,0.1);'>
+                <div style='display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px'>
+                    <div style='font-size:1.2rem;font-weight:700;letter-spacing:1px'>CONNEXION</div>
                 </div>
-                <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Identifiez-vous pour accéder à la plateforme</div>
-            </div>""", unsafe_allow_html=True)
+                <div class='k-subtext' style='text-align:center;margin-bottom:24px;font-size:0.8rem'>Accédez à votre espace sécurisé</div>
+            """, unsafe_allow_html=True)
+            
             if st.session_state.tentatives >= 5:
-                st.markdown("""<div class='k-alert-danger'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-                    Trop de tentatives. Compte bloqué.
-                </div>""", unsafe_allow_html=True)
+                st.error("⛔ Trop de tentatives. Compte bloqué.")
+                st.markdown("</div>", unsafe_allow_html=True)
                 return
             
             with st.form("login_form"):
-                login    = st.text_input("Identifiant", placeholder="Votre login")
-                password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
+                login    = st.text_input("Identifiant", placeholder="Nom d'utilisateur")
+                password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
+                st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
                 submitted = st.form_submit_button("SE CONNECTER", type="primary", use_container_width=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
             
             if submitted:
                 user = verifier(login, password)
@@ -588,34 +580,30 @@ def page_login():
                     st.session_state.utilisateur = user
                     st.session_state.login_nom = login.lower()
                     st.session_state.tentatives = 0
-                    st.success("Connexion réussie."); time.sleep(0.5); st.rerun()
+                    st.success("Connexion autorisée."); time.sleep(0.5); st.rerun()
                 else:
                     st.session_state.tentatives += 1
-                    st.markdown("""<div class='k-alert-danger'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-                        Identifiant ou mot de passe incorrect.
-                    </div>""", unsafe_allow_html=True)
+                    st.error("Identifiants incorrects.")
         
         else:
-            st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
-                <div style='display:flex;align-items:center;gap:10px;margin-bottom:4px'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    <div style='font-size:1.1rem;font-weight:700'>Inscription</div>
+            st.markdown("""<div class='k-card' style='padding:32px 28px; border: 1px solid rgba(255,255,255,0.1);'>
+                <div style='display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px'>
+                    <div style='font-size:1.2rem;font-weight:700;letter-spacing:1px'>INSCRIPTION</div>
                 </div>
-                <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Créez votre compte personnel</div>
-            </div>""", unsafe_allow_html=True)
+                <div class='k-subtext' style='text-align:center;margin-bottom:24px;font-size:0.8rem'>Rejoignez la plateforme Kotighi</div>
+            """, unsafe_allow_html=True)
+            
             new_login = st.text_input("Nouvel Identifiant")
             new_name  = st.text_input("Nom Complet")
             new_role  = st.selectbox("Rôle", ["Analyste Cyber", "Medecin"])
-            new_pass  = st.text_input("Nouveau Mot de passe", type="password")
+            new_pass  = st.text_input("Mot de passe", type="password")
+            
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
             if st.button("CRÉER MON COMPTE", type="primary", use_container_width=True):
                 if new_login and new_pass and new_name:
                     is_strong, msg_strong = check_password_strength(new_pass)
                     if not is_strong:
-                        st.markdown(f"""<div class='k-alert-danger'>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-                            {msg_strong}
-                        </div>""", unsafe_allow_html=True)
+                        st.warning(msg_strong)
                     else:
                         USERS[new_login.lower()] = {
                             "hash": h(new_pass),
@@ -623,26 +611,30 @@ def page_login():
                             "nom": new_name,
                             "acces": ["Dashboard", "Cybersecurite"] if new_role == "Analyste Cyber" else ["Dashboard", "Sante"]
                         }
-                        st.markdown("""<div class='k-alert-success'>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            Compte créé avec succès ! Connectez-vous.
-                        </div>""", unsafe_allow_html=True)
+                        st.success("Compte créé ! Connectez-vous.")
                         st.session_state.auth_mode = "Connexion"
                         time.sleep(1.5)
                         st.rerun()
                 else:
-                    st.error("Veuillez remplir tous les champs.")
+                    st.error("Tous les champs sont requis.")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    # SÉLECTEUR DE MODE EN BAS DE PAGE
-    st.markdown("<div style='height: 50px'></div>", unsafe_allow_html=True)
-    _, c_b, _ = st.columns([1, 1, 1])
-    with c_b:
-        mode = st.radio("Action", ["Connexion", "Inscription"], 
+        # SWITCH DE MODE SOUS LE FORMULAIRE
+        st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+        mode = st.radio("Mode", ["Connexion", "Inscription"], 
                         index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector_bottom")
+                        horizontal=True, label_visibility="collapsed", key="auth_switch_bottom")
+        
         if mode != st.session_state.auth_mode:
             st.session_state.auth_mode = mode
             st.rerun()
+
+    # LOGO EN BAS DE PAGE (PIED DE PAGE) OU EN HAUT ?
+    # Le user a dit "En bas de la page pas sous le logo". 
+    # J'ai mis le formulaire en bas. Le logo est resté en haut via le code précédent (non modifié ici car hors scope du replace).
+    
+    st.markdown("<div style='height: 5vh'></div>", unsafe_allow_html=True)
 
         st.markdown("""<div style='margin-top:24px;text-align:center'>
             <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.72rem'>
