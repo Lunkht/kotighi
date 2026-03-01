@@ -543,24 +543,30 @@ def page_login():
     st.session_state.auth_mode = mode
     
     # 2. LOGO (Juste en dessous)
-    # _, c_l, _ = st.columns([1, 0.8, 1])
-    # with c_l:
-    #     logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
-    #     st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
+    _, c_l, _ = st.columns([1, 0.8, 1])
+    with c_l:
+        logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
+        st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
         
-    st.markdown(f"""<div style='text-align:center;padding:0 0 16px'>
-        <div class='k-badge' style='margin:8px auto;display:inline-flex'>{st.session_state.auth_mode.upper()}</div>
-    </div>""", unsafe_allow_html=True)
+    # st.markdown(f"""<div style='text-align:center;padding:0 0 16px'>
+    #    <div class='k-badge' style='margin:8px auto;display:inline-flex'>{st.session_state.auth_mode.upper()}</div>
+    # </div>""", unsafe_allow_html=True)
     
     _,col,_ = st.columns([1,1.2,1])
     with col:
         if st.session_state.auth_mode == "Connexion":
             st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>Connexion</div>
+                <div style='display:flex;align-items:center;gap:10px;margin-bottom:4px'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <div style='font-size:1.1rem;font-weight:700'>Connexion</div>
+                </div>
                 <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Identifiez-vous pour accéder à la plateforme</div>
             </div>""", unsafe_allow_html=True)
             if st.session_state.tentatives >= 5:
-                st.markdown("<div class='k-alert-danger'>⛔ Trop de tentatives. Compte bloqué.</div>", unsafe_allow_html=True)
+                st.markdown("""<div class='k-alert-danger'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                    Trop de tentatives. Compte bloqué.
+                </div>""", unsafe_allow_html=True)
                 return
             login    = st.text_input("Identifiant", placeholder="Votre login")
             password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
@@ -575,11 +581,17 @@ def page_login():
                     st.success("Connexion réussie."); time.sleep(0.8); st.rerun()
                 else:
                     st.session_state.tentatives += 1
-                    st.markdown("<div class='k-alert-danger'>Identifiant ou mot de passe incorrect.</div>", unsafe_allow_html=True)
+                    st.markdown("""<div class='k-alert-danger'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                        Identifiant ou mot de passe incorrect.
+                    </div>""", unsafe_allow_html=True)
         
         else:
             st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
-                <div style='font-size:1.1rem;font-weight:700;margin-bottom:4px'>📝 Inscription</div>
+                <div style='display:flex;align-items:center;gap:10px;margin-bottom:4px'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <div style='font-size:1.1rem;font-weight:700'>Inscription</div>
+                </div>
                 <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.75rem;margin-bottom:20px'>Créez votre compte personnel</div>
             </div>""", unsafe_allow_html=True)
             new_login = st.text_input("Nouvel Identifiant")
@@ -590,7 +602,10 @@ def page_login():
                 if new_login and new_pass and new_name:
                     is_strong, msg_strong = check_password_strength(new_pass)
                     if not is_strong:
-                        st.markdown(f"<div class='k-alert-danger'>{msg_strong}</div>", unsafe_allow_html=True)
+                        st.markdown(f"""<div class='k-alert-danger'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                            {msg_strong}
+                        </div>""", unsafe_allow_html=True)
                     else:
                         USERS[new_login.lower()] = {
                             "hash": h(new_pass),
@@ -598,7 +613,10 @@ def page_login():
                             "nom": new_name,
                             "acces": ["Dashboard", "Cybersecurite"] if new_role == "Analyste Cyber" else ["Dashboard", "Sante"]
                         }
-                        st.markdown("<div class='k-alert-success'>✅ Compte créé avec succès ! Connectez-vous.</div>", unsafe_allow_html=True)
+                        st.markdown("""<div class='k-alert-success'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:6px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Compte créé avec succès ! Connectez-vous.
+                        </div>""", unsafe_allow_html=True)
                         st.session_state.auth_mode = "Connexion"
                         time.sleep(1.5)
                         st.rerun()
