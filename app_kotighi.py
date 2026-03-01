@@ -568,17 +568,20 @@ def page_login():
                     Trop de tentatives. Compte bloqué.
                 </div>""", unsafe_allow_html=True)
                 return
-            login    = st.text_input("Identifiant", placeholder="Votre login")
-            password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
             
-            if st.button("SE CONNECTER", type="primary", use_container_width=True):
+            with st.form("login_form"):
+                login    = st.text_input("Identifiant", placeholder="Votre login")
+                password = st.text_input("Mot de passe", type="password", placeholder="Votre mot de passe")
+                submitted = st.form_submit_button("SE CONNECTER", type="primary", use_container_width=True)
+            
+            if submitted:
                 user = verifier(login, password)
                 if user:
                     st.session_state.connecte = True
                     st.session_state.utilisateur = user
                     st.session_state.login_nom = login.lower()
                     st.session_state.tentatives = 0
-                    st.success("Connexion réussie."); time.sleep(0.8); st.rerun()
+                    st.success("Connexion réussie."); time.sleep(0.5); st.rerun()
                 else:
                     st.session_state.tentatives += 1
                     st.markdown("""<div class='k-alert-danger'>
