@@ -775,7 +775,7 @@ def app():
             tab1, tab2 = st.tabs(["SCAN", "SURVEILLANCE"])
             
             with tab1:
-                st.markdown("### 🎯 Cibles d'Analyse")
+                st.markdown("### Cibles d'Analyse")
                 
                 # Gestion dynamique des champs d'IP
                 if "ip_count" not in st.session_state: st.session_state.ip_count = 1
