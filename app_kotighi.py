@@ -542,8 +542,8 @@ def page_login():
     #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
     # st.session_state.auth_mode = mode
     
-    # Espace flexible pour pousser le contenu vers le bas
-    st.markdown("<div style='height: 25vh'></div>", unsafe_allow_html=True)
+    # Espace flexible pour pousser le contenu vers le bas (Centre verticalement/bas)
+    st.markdown("<div style='height: 35vh'></div>", unsafe_allow_html=True)
     
     # CONTENEUR PRINCIPAL CENTRÉ EN BAS
     _, col_main, _ = st.columns([1, 1.2, 1])
@@ -630,12 +630,7 @@ def page_login():
             st.session_state.auth_mode = mode
             st.rerun()
 
-    # LOGO EN BAS DE PAGE (PIED DE PAGE) OU EN HAUT ?
-    # Le user a dit "En bas de la page pas sous le logo". 
-    # J'ai mis le formulaire en bas. Le logo est resté en haut via le code précédent (non modifié ici car hors scope du replace).
-    
-    st.markdown("<div style='height: 5vh'></div>", unsafe_allow_html=True)
-
+        # INFO COMPTES DEMO (INTÉGRÉ DANS LA COLONNE)
         st.markdown("""<div style='margin-top:24px;text-align:center'>
             <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.72rem'>
                 Comptes démo :<br>
@@ -644,6 +639,7 @@ def page_login():
                 <span style='color:#00E5FF'>medecin</span> / sante456
             </div>
         </div>""", unsafe_allow_html=True)
+
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
