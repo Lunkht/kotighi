@@ -904,8 +904,7 @@ def app():
     #  SANTÉ — MODULE CLINIQUE
     # ═══════════════════════════════════════════════════════════════
     elif page == "Sante":
-        st.markdown("## <span style='color:#00E5FF'>//</span> MODULE CLINIQUE <span class='k-badge' style='vertical-align:middle;margin-left:8px'>v2.4 · IA</span>", unsafe_allow_html=True)
-        st.markdown("<p class='k-subtext k-mono' style='font-size:.9rem'>SYSTÈME D'AIDE AU DIAGNOSTIC MÉDICAL PAR IA</p>", unsafe_allow_html=True)
+        st.markdown("## MODULE SANTÉ", unsafe_allow_html=True)
         st.divider()
         
         ms, labels, conseils_prev = get_sante()
@@ -914,17 +913,15 @@ def app():
         c_main, c_res = st.columns([1.6, 1])
         
         with c_main:
-            st.markdown("<div class='clinic-card'>", unsafe_allow_html=True)
-            st.markdown("#### PARAMÈTRES PATIENT")
+            st.markdown("### Paramètres Patient")
             c1, c2 = st.columns(2)
-            with c1: age = st.slider("Âge", 0, 120, 35)
-            with c2: dur_s = st.select_slider("Durée des symptômes", options=["< 24h", "1-3 jours", "3-7 jours", "> 7 jours"])
-            st.markdown("</div>", unsafe_allow_html=True)
+            with c1: age = st.number_input("Âge (années)", min_value=0, max_value=120, value=35, step=1)
+            with c2: dur_s = st.selectbox("Durée des symptômes", options=["< 24h", "1-3 jours", "3-7 jours", "> 7 jours"])
             
-            st.markdown("<div class='clinic-card'>", unsafe_allow_html=True)
-            st.markdown("#### ANALYSE SYMPTOMATIQUE")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### Symptômes")
             
-            t1, t2, t3 = st.tabs(["GÉNÉRAL", "RESPIRATOIRE", "DIGESTIF & AUTRES"])
+            t1, t2, t3 = st.tabs(["Général", "Respiratoire", "Digestif/Autre"])
             
             with t1:
                 c_a, c_b = st.columns(2)
