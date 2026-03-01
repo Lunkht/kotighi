@@ -537,23 +537,30 @@ def page_login():
     </style>""", unsafe_allow_html=True)
 
     # 1. BOUTONS RADIO (Centrés en haut sans colonnes pour prendre toute la largeur)
-    mode = st.radio("Action", ["Connexion", "Inscription"], 
-                    index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                    horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
-    st.session_state.auth_mode = mode
+    # mode = st.radio("Action", ["Connexion", "Inscription"], 
+    #                 index=0 if st.session_state.auth_mode == "Connexion" else 1,
+    #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+    # st.session_state.auth_mode = mode
     
-    # 2. LOGO (Juste en dessous)
+    # Espace avant le formulaire pour centrer verticalement
+    st.markdown("<div style='height: 10vh'></div>", unsafe_allow_html=True)
+    
+    # LOGO
     _, c_l, _ = st.columns([1, 0.8, 1])
     with c_l:
         logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
         st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
-        
-    # st.markdown(f"""<div style='text-align:center;padding:0 0 16px'>
-    #    <div class='k-badge' style='margin:8px auto;display:inline-flex'>{st.session_state.auth_mode.upper()}</div>
-    # </div>""", unsafe_allow_html=True)
     
+    # BLOC CENTRAL
     _,col,_ = st.columns([1,1.2,1])
     with col:
+        # BOUTONS RADIO DANS LE BLOC
+        mode = st.radio("Action", ["Connexion", "Inscription"], 
+                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+        st.session_state.auth_mode = mode
+        st.markdown("<br>", unsafe_allow_html=True)
+
         if st.session_state.auth_mode == "Connexion":
             st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
                 <div style='display:flex;align-items:center;gap:10px;margin-bottom:4px'>
