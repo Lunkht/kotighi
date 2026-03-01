@@ -642,23 +642,29 @@ def app():
 
     # SIDEBAR
     with st.sidebar:
-        # LOGO
+        # LOGO -> ICONE UTILISATEUR
         c_logo, _ = st.columns([1, 0.1])
         with c_logo:
-            logo_color = "#E2E8F0" if st.session_state.theme == "Sombre" else "#1E293B"
-            st.markdown(get_logo_html(logo_color), unsafe_allow_html=True)
+            # Icône utilisateur SVG simple et élégante
+            st.markdown("""
+            <div style='text-align:center; margin-bottom: 10px;'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color:#64748B; background:rgba(255,255,255,0.05); border-radius:50%; padding:15px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            """, unsafe_allow_html=True)
             
         st.markdown("""<div style='text-align:center;padding-bottom:20px'>
-            <div class='k-badge' style='margin:6px auto;display:inline-flex'>V3.0 · ENTERPRISE</div>
+            <div class='k-badge' style='margin:6px auto;display:inline-flex;border-color:transparent;background:transparent;color:#64748B'>V3.0 · ENTERPRISE</div>
         </div>""", unsafe_allow_html=True)
         
-        # User Profile Card
+        # User Profile Card (Simplifié)
         user = st.session_state.utilisateur
         st.markdown(f"""
-        <div class='k-profile'>
-            <div class='k-label'>Connecté en tant que</div>
-            <div class='k-profile-name'>👤 {user['nom']}</div>
-            <div class='k-profile-role'>{user['role']}</div>
+        <div style='text-align:center; margin-bottom:20px'>
+            <div style='font-size:1.1rem; font-weight:700; color:{'#E2E8F0' if st.session_state.theme == "Sombre" else '#1E293B'}'>{user['nom']}</div>
+            <div style='font-size:0.8rem; color:#64748B; text-transform:uppercase; letter-spacing:1px'>{user['role']}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -754,7 +760,8 @@ def app():
     #  CYBERSECURITE — SOC TERMINAL
     # ═══════════════════════════════════════════════════════════════
     elif page == "Cybersecurite":
-        st.markdown("## <span style='color:#00E5FF'>//</span> SOC TERMINAL <span class='k-badge' style='vertical-align:middle;margin-left:8px'>v3.1 · LIVE</span>", unsafe_allow_html=True)
+        st.markdown("## MODULE CYBER", unsafe_allow_html=True)
+        st.divider()
         
         m_rf, m_gb, sc = get_cyber()
         
@@ -765,18 +772,17 @@ def app():
         
         with col_main:
             # ONGLETS FONCTIONNELS
-            tab1, tab2 = st.tabs(["SCAN MANUEL / BATCH", "LIVE MONITOR"])
+            tab1, tab2 = st.tabs(["SCAN", "SURVEILLANCE"])
             
             with tab1:
-                st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
-                st.markdown("<div class='soc-header'>CIBLE(S) D'ANALYSE</div>", unsafe_allow_html=True)
+                st.markdown("### 🎯 Cibles d'Analyse")
                 
                 # Gestion dynamique des champs d'IP
                 if "ip_count" not in st.session_state: st.session_state.ip_count = 1
                 
                 # Boutons +/- pour ajouter/retirer des champs
                 c_add, c_rem, _ = st.columns([1, 1, 4])
-                if c_add.button("➕ Ajouter IP", key="add_ip"): 
+                if c_add.button("➕ Ajouter", key="add_ip"): 
                     st.session_state.ip_count += 1
                     st.rerun()
                 if c_rem.button("➖ Retirer", key="rem_ip") and st.session_state.ip_count > 1: 
@@ -787,20 +793,22 @@ def app():
                 cols = st.columns(3) # Grille de 3 colonnes pour les inputs
                 for i in range(st.session_state.ip_count):
                     with cols[i % 3]:
-                        val = st.text_input(f"IP Cible #{i+1}", key=f"ip_input_{i}", placeholder="192.168.x.x")
+                        val = st.text_input(f"IP #{i+1}", key=f"ip_input_{i}", placeholder="192.168.x.x")
                         if val: ips_list.append(val)
                 
                 st.markdown("---")
+                st.caption("Paramètres de Simulation")
                 c1, c2, c3 = st.columns(3)
-                with c1: req = st.number_input("Req/min (Simulé)", 0, 10000, 150)
-                with c2: ports = st.number_input("Ports ouverts (Simulé)", 0, 1000, 5)
-                with c3: terr = st.number_input("Taux erreur (Simulé)", 0.0, 1.0, 0.01)
+                with c1: req = st.number_input("Req/min", 0, 10000, 150)
+                with c2: ports = st.number_input("Ports", 0, 1000, 5)
+                with c3: terr = st.number_input("Erreur", 0.0, 1.0, 0.01)
                 
+                st.markdown("<br>", unsafe_allow_html=True)
                 col_act, col_add = st.columns([1, 1])
                 with col_act:
-                    go_scan = st.button("LANCER LE SCAN BATCH", type="primary", use_container_width=True)
+                    go_scan = st.button("LANCER SCAN", type="primary", use_container_width=True)
                 with col_add:
-                    add_watch = st.button("AJOUTER À LA SURVEILLANCE", use_container_width=True)
+                    add_watch = st.button("AJOUTER SURVEILLANCE", use_container_width=True)
                 
                 if go_scan and ips_list:
                     ips = [ip.strip() for ip in ips_list if ip.strip()]
@@ -824,7 +832,7 @@ def app():
                         proba_moy = (p_rf + p_gb) / 2
                         score = proba_moy[1]
                         
-                        verdict = "CRITIQUE" if score > 0.8 else ("SUSPECT" if score > 0.5 else "SECURE")
+                        verdict = "CRITIQUE" if score > 0.8 else ("SUSPECT" if score > 0.5 else "OK")
                         results.append({"IP": ip, "Status": verdict, "Score": f"{score*100:.1f}%", "Ports": sim_ports})
                         
                         time.sleep(0.1) # Effet scan rapide
@@ -833,84 +841,62 @@ def app():
                     status_text.empty()
                     progress_bar.empty()
                     
-                    # Affichage style Terminal
-                    st.markdown("<div class='soc-header'>RÉSULTATS DU SCAN</div>", unsafe_allow_html=True)
+                    st.markdown("### Résultats")
                     df_res = pd.DataFrame(results)
-                    
-                    # Style conditionnel
-                    def highlight_status(val):
-                        color = '#ff4757' if val == 'CRITIQUE' else ('#ffa502' if val == 'SUSPECT' else '#00f5c4')
-                        return f'color: {color}; font-weight: bold'
-                        
-                    st.dataframe(df_res.style.applymap(highlight_status, subset=['Status']), use_container_width=True)
+                    st.dataframe(df_res, use_container_width=True)
                 
                 if add_watch and ips_list:
                     new_ips = [ip.strip() for ip in ips_list if ip.strip()]
                     for ip in new_ips:
                         if ip not in [w["ip"] for w in st.session_state.watchlist]:
                             st.session_state.watchlist.append({"ip": ip, "added_at": datetime.datetime.now().strftime("%H:%M"), "status": "PENDING"})
-                    st.success(f"{len(new_ips)} cible(s) ajoutée(s) à la surveillance continue.")
-                
-                st.markdown("</div>", unsafe_allow_html=True)
+                    st.success(f"{len(new_ips)} cible(s) ajoutée(s).")
 
             with tab2:
-                st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
-                st.markdown("<div class='soc-header'>SURVEILLANCE ACTIVE (LIVE MONITOR)</div>", unsafe_allow_html=True)
+                st.markdown("### Surveillance Active")
                 
                 if not st.session_state.watchlist:
-                    st.info("Aucune cible sous surveillance. Ajoutez des IPs depuis l'onglet Scan.")
+                    st.info("Aucune cible surveillée.")
                 else:
-                    # Simulation de mise à jour temps réel
-                    col_metrics = st.columns(4)
-                    col_metrics[0].metric("Cibles Actives", len(st.session_state.watchlist))
-                    col_metrics[1].metric("Alertes (1h)", np.random.randint(0, 5))
-                    col_metrics[2].metric("Bande Passante", f"{np.random.randint(50, 500)} Mbps")
+                    col_metrics = st.columns(3)
+                    col_metrics[0].metric("Cibles", len(st.session_state.watchlist))
+                    col_metrics[1].metric("Alertes", np.random.randint(0, 5))
+                    col_metrics[2].metric("Trafic", f"{np.random.randint(50, 500)} Mbps")
                     
                     st.markdown("---")
                     
                     for target in st.session_state.watchlist:
-                        # Simulation état
                         is_threat = np.random.random() > 0.8
-                        status_color = "dot-red" if is_threat else "dot-green"
-                        status_txt = "MENACE DÉTECTÉE" if is_threat else "NORMAL"
+                        status_txt = "MENACE" if is_threat else "NORMAL"
                         traffic = np.random.randint(100, 2000)
                         
-                        cols = st.columns([0.5, 2, 1, 1, 1])
-                        with cols[0]: st.markdown(f"<div class='status-dot {status_color}'></div>", unsafe_allow_html=True)
-                        with cols[1]: st.markdown(f"<span style='font-family:monospace;font-size:1.1rem'>{target['ip']}</span>", unsafe_allow_html=True)
-                        with cols[2]: st.caption(f"Trafic: {traffic} req/m")
-                        with cols[3]: st.markdown(f"<span style='color:{'#EF4444' if is_threat else '#10B981'}'>{status_txt}</span>", unsafe_allow_html=True)
-                        with cols[4]: 
-                            if st.button("STOP", key=f"del_{target['ip']}"):
+                        cols = st.columns([2, 1, 1, 1])
+                        with cols[0]: st.markdown(f"**{target['ip']}**")
+                        with cols[1]: st.caption(f"{traffic} req/m")
+                        with cols[2]: st.markdown(f"<span style='color:{'#EF4444' if is_threat else '#10B981'}'>{status_txt}</span>", unsafe_allow_html=True)
+                        with cols[3]: 
+                            if st.button("X", key=f"del_{target['ip']}"):
                                 st.session_state.watchlist.remove(target)
                                 st.rerun()
-                        st.markdown("<div style='border-bottom:1px solid #1C1F2E;margin:5px 0'></div>", unsafe_allow_html=True)
+                        st.markdown("<hr style='margin:5px 0'>", unsafe_allow_html=True)
                         
                         if is_threat:
-                            st.toast(f"🚨 ALERTE SUR {target['ip']}", icon="🔥")
-                
-                st.markdown("</div>", unsafe_allow_html=True)
+                            st.toast(f"Alerte : {target['ip']}")
 
         with col_side:
-            st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
-            st.markdown("<div class='soc-header'>FLUX D'ÉVÉNEMENTS</div>", unsafe_allow_html=True)
-            # Logs fictifs défilants
+            st.markdown("### Événements")
             events = [
                 f"[{datetime.datetime.now().strftime('%H:%M:%S')}] SCAN BLOCK 192.168.1.45",
                 f"[{datetime.datetime.now().strftime('%H:%M:%S')}] SSH FAIL 10.0.0.12",
-                f"[{datetime.datetime.now().strftime('%H:%M:%S')}] FW UPDATE SUCCESS",
-                f"[{(datetime.datetime.now()-datetime.timedelta(minutes=1)).strftime('%H:%M:%S')}] API KOTIGHI CONNECTED"
+                f"[{datetime.datetime.now().strftime('%H:%M:%S')}] FW UPDATE SUCCESS"
             ]
             for evt in events:
-                st.markdown(f"<div class='k-mono' style='font-size:0.72rem;color:#00E5FF;margin-bottom:6px'>{evt}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.caption(evt)
             
-            st.markdown("<div class='soc-panel'>", unsafe_allow_html=True)
-            st.markdown("<div class='soc-header'>ÉTAT SYSTÈME</div>", unsafe_allow_html=True)
-            st.progress(88, text="CPU LOAD")
-            st.progress(45, text="RAM USAGE")
-            st.progress(12, text="NETWORK I/O")
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("---")
+            st.markdown("### Système")
+            st.progress(88, text="CPU")
+            st.progress(45, text="RAM")
 
     # ═══════════════════════════════════════════════════════════════
     #  SANTÉ — MODULE CLINIQUE
@@ -1067,15 +1053,15 @@ def app():
     #  GESTION
     # ═══════════════════════════════════════════════════════════════
     elif page == "Gestion":
-        st.markdown("## <span style='color:#00E5FF'>//</span> GESTION <span class='k-badge' style='vertical-align:middle;margin-left:8px'>ADMIN</span>", unsafe_allow_html=True)
+        st.markdown("## GESTION", unsafe_allow_html=True)
         st.divider()
         
-        st.markdown("#### 👥 Utilisateurs Enregistrés")
+        st.markdown("### Utilisateurs")
         df_u = pd.DataFrame([{"Login":k,"Nom":v["nom"],"Rôle":v["role"],"Modules":", ".join(v["acces"])} for k,v in USERS.items()])
         st.dataframe(df_u,use_container_width=True,hide_index=True)
         st.markdown("<br>",unsafe_allow_html=True)
         
-        st.markdown("#### 🛡️ Logs de Sécurité Globaux")
+        st.markdown("### Logs Globaux")
         if st.session_state.historique:
             df_global = pd.DataFrame(st.session_state.historique[::-1])
             if "IP" in df_global.columns:
@@ -1084,11 +1070,11 @@ def app():
                 df_global["Utilisateur"] = df_global["Utilisateur"].apply(mask_data)
                 
             st.dataframe(df_global, use_container_width=True, hide_index=True)
-            st.caption("🔒 Les IPs et identifiants sont masqués pour la confidentialité.")
         else:
-            st.info("Aucun log disponible.")
+            st.info("Aucun log.")
             
-        st.markdown("<div class='k-info'>Pour ajouter un utilisateur : ajouter une entrée dans USERS avec h() pour le mot de passe.<br><br>En production : utiliser PostgreSQL ou Firebase Auth.</div>",unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.caption("Pour ajouter un utilisateur : ajouter une entrée dans USERS.")
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
