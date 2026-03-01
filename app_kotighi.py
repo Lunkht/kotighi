@@ -555,11 +555,11 @@ def page_login():
     _,col,_ = st.columns([1,1.2,1])
     with col:
         # BOUTONS RADIO DANS LE BLOC
-        mode = st.radio("Action", ["Connexion", "Inscription"], 
-                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
-                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
-        st.session_state.auth_mode = mode
-        st.markdown("<br>", unsafe_allow_html=True)
+        # mode = st.radio("Action", ["Connexion", "Inscription"], 
+        #                 index=0 if st.session_state.auth_mode == "Connexion" else 1,
+        #                 horizontal=True, label_visibility="collapsed", key="auth_mode_selector")
+        # st.session_state.auth_mode = mode
+        # st.markdown("<br>", unsafe_allow_html=True)
 
         if st.session_state.auth_mode == "Connexion":
             st.markdown("""<div class='k-card' style='padding:32px 28px;margin-top:12px'>
@@ -632,6 +632,17 @@ def page_login():
                         st.rerun()
                 else:
                     st.error("Veuillez remplir tous les champs.")
+
+    # SÉLECTEUR DE MODE EN BAS DE PAGE
+    st.markdown("<div style='height: 50px'></div>", unsafe_allow_html=True)
+    _, c_b, _ = st.columns([1, 1, 1])
+    with c_b:
+        mode = st.radio("Action", ["Connexion", "Inscription"], 
+                        index=0 if st.session_state.auth_mode == "Connexion" else 1,
+                        horizontal=True, label_visibility="collapsed", key="auth_mode_selector_bottom")
+        if mode != st.session_state.auth_mode:
+            st.session_state.auth_mode = mode
+            st.rerun()
 
         st.markdown("""<div style='margin-top:24px;text-align:center'>
             <div class='k-subtext' style='font-family:JetBrains Mono,monospace;font-size:.72rem'>
