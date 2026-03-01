@@ -139,10 +139,6 @@ def apply_theme():
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
         animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }}
-    .light-theme .glass-card {{
-        background: rgba(255, 255, 255, 0.7) !important;
-        border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    }}
 
     /* ═══ METRIC CARDS ═══ */
     [data-testid="metric-container"] {{
@@ -202,9 +198,6 @@ def apply_theme():
         box-shadow: 0 12px 30px {primary}40;
         filter: brightness(1.1);
     }}
-    .stButton > button:active {{
-        transform: scale(0.98);
-    }}
 
     /* ═══ TYPOGRAPHY ═══ */
     h1 {{
@@ -224,43 +217,7 @@ def apply_theme():
         font-size: 1.8rem !important;
         letter-spacing: -1px;
     }}
-
-    /* ═══ LOGIN PAGE SPECIFIC ═══ */
-    .login-container {{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        min-height: 80vh;
-    }}
-    .login-header-text {{
-        text-align: center;
-        margin-bottom: 2rem;
-        animation: fadeIn 1s ease-out;
-    }}
-    .auth-switch-container {{
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-        animation: fadeIn 1.2s ease-out;
-    }}
-    .auth-switch-btn {{
-        background: transparent !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        color: {subtext} !important;
-        padding: 8px 16px !important;
-        border-radius: 30px !important;
-        font-size: 0.8rem !important;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }}
-    .auth-switch-btn.active {{
-        background: {primary}20 !important;
-        border-color: {primary} !important;
-        color: {primary} !important;
-    }}
+    h3, h4 {{ font-family: 'Inter', sans-serif !important; font-weight: 600 !important; color: {text} !important; }}
 
     /* ═══ TABS ═══ */
     .stTabs [data-baseweb="tab-list"] {{
@@ -289,30 +246,70 @@ def apply_theme():
     .k-badge {{
         background: linear-gradient(90deg, {primary}20, {accent}20);
         border: 1px solid {primary}40;
-        border-radius: 30px;
-        padding: 6px 18px;
+        border-radius: 20px;
+        padding: 6px 14px;
         font-family: 'JetBrains Mono', monospace;
         font-size: .75rem;
         font-weight: 700;
         color: {primary};
         letter-spacing: 2px;
-        box-shadow: 0 0 15px {primary}15;
     }}
     .k-card {{
         background: {card};
         border: 1px solid {border};
-        border-radius: 20px;
-        padding: 28px;
-        transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all .3s ease;
+        animation: fadeIn .5s ease-out;
     }}
-    .k-card:hover {{
-        transform: translateY(-4px);
-        border-color: {primary}40;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    .k-card:hover {{ border-color: {primary}40; box-shadow: 0 8px 30px rgba(0,0,0,.15); }}
+    
+    .k-card-accent {{
+        background: {card};
+        border: 1px solid {border};
+        border-left: 3px solid {primary};
+        border-radius: 12px;
+        padding: 20px 24px;
+    }}
+    .k-alert-danger {{ background: {danger}08; border: 1px solid {danger}25; border-left: 3px solid {danger}; border-radius: 10px; padding: 14px 18px; color: {danger}; font-family: 'JetBrains Mono', monospace; }}
+    .k-alert-success {{ background: {success}08; border: 1px solid {success}25; border-left: 3px solid {success}; border-radius: 10px; padding: 14px 18px; color: {success}; font-family: 'JetBrains Mono', monospace; }}
+    .k-alert-warning {{ background: {warning}08; border: 1px solid {warning}25; border-left: 3px solid {warning}; border-radius: 10px; padding: 14px 18px; color: {warning}; font-family: 'JetBrains Mono', monospace; }}
+    .k-info {{ background: {accent}08; border: 1px solid {accent}20; border-radius: 12px; padding: 16px 20px; color: {accent}; font-family: 'JetBrains Mono', monospace; }}
+    .k-mono {{ font-family: 'JetBrains Mono', monospace; }}
+    .k-subtext {{ color: {subtext}; font-size: .85rem; }}
+    .k-label {{ font-family: 'Inter', sans-serif; font-weight: 600; font-size: .7rem; text-transform: uppercase; letter-spacing: 1.5px; color: {subtext}; margin-bottom: 4px; }}
+    
+    .soc-panel {{ background: {card}; border: 1px solid {border}; border-radius: 12px; padding: 20px; margin-bottom: 16px; }}
+    .soc-header {{ font-family: 'JetBrains Mono', monospace; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: {subtext}; border-bottom: 1px solid {border}; padding-bottom: 10px; margin-bottom: 16px; }}
+    .status-dot {{ height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }}
+    .dot-green {{ background: {success}; box-shadow: 0 0 8px {success}80; }}
+    .dot-red {{ background: {danger}; box-shadow: 0 0 8px {danger}80; animation: blink 1.2s ease-in-out infinite; }}
+    .dot-yellow {{ background: {warning}; box-shadow: 0 0 8px {warning}60; }}
+    
+    .clinic-card {{ background: {card}; border: 1px solid {border}; border-left: 3px solid {primary}; border-radius: 14px; padding: 24px; margin-bottom: 16px; transition: all .3s ease; }}
+    .clinic-card:hover {{ box-shadow: 0 6px 24px rgba(0,0,0,.15); border-left-color: {accent}; }}
+    
+    .k-profile {{ background: {card}; border: 1px solid {border}; border-radius: 14px; padding: 16px; margin-bottom: 20px; }}
+    .k-profile-name {{ font-weight: 700; color: {text}; font-size: .95rem; margin-bottom: 2px; }}
+    .k-profile-role {{ font-family: 'JetBrains Mono', monospace; font-size: .7rem; font-weight: 600; color: {primary}; text-transform: uppercase; letter-spacing: 1px; }}
+    
+    .feature-card {{ background: {card}; border: 1px solid {border}; border-radius: 14px; padding: 20px; transition: all .3s cubic-bezier(.4,0,.2,1); cursor: pointer; }}
+    .feature-card:hover {{ transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.18); border-color: {primary}40; }}
+
+    /* ═══ FORMS GLASSMORPHISM ═══ */
+    [data-testid="stForm"] {{
+        background: rgba(15, 17, 23, 0.4) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
     }}
 
-    /* ... keeping other k-classes similarly updated ... */
-    .dot-red {{ background: {danger}; box-shadow: 0 0 12px {danger}; animation: blink 1s ease-in-out infinite; }}
+    /* ═══ LOGIN PAGE SPECIFIC ═══ */
+    .login-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; min-height: 80vh; }}
+    .login-header-text {{ text-align: center; margin-bottom: 2rem; animation: fadeIn 1s ease-out; }}
     
     </style>""", unsafe_allow_html=True)
 
@@ -389,30 +386,26 @@ def page_login():
     # Arrière-plan immersif
     st.markdown("""
         <div style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-                    background: radial-gradient(circle at 20% 30%, #00E5FF10 0%, transparent 50%),
-                                radial-gradient(circle at 80% 70%, #8B5CF610 0%, transparent 50%),
+                    background: radial-gradient(circle at 20% 30%, #00E5FF15 0%, transparent 50%),
+                                radial-gradient(circle at 80% 70%, #8B5CF615 0%, transparent 50%),
                                 #06070A;'>
         </div>
     """, unsafe_allow_html=True)
 
-    # Layout centré
-    st.markdown("<div class='login-container'>", unsafe_allow_html=True)
-    
-    col_l, col_main, col_r = st.columns([1, 1.5, 1])
+    # Header central
+    st.markdown(f"""
+        <div style='text-align: center; padding-top: 10vh; margin-bottom: 2rem;'>
+            <div style='width: 80px; margin: 0 auto 1rem;'>{get_logo_html('#00E5FF')}</div>
+            <h1 style='font-size: 2.2rem !important; margin-bottom: 0;'>KOTIGHI AI</h1>
+            <p style='color: #64748B; font-weight: 500; letter-spacing: 1px; font-size: 0.8rem;'>PLATEFORME D'INTELLIGENCE ANALYTIQUE</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Layout pour le formulaire
+    _, col_main, _ = st.columns([1, 1.2, 1])
     
     with col_main:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        
-        # Logo et Titre
-        st.markdown(f"<div style='width: 100px; margin: 0 auto 1.5rem;'>{get_logo_html('#00E5FF')}</div>", unsafe_allow_html=True)
-        st.markdown("""
-            <div class='login-header-text'>
-                <h1 style='font-size: 2.2rem !important; margin-bottom: 0;'>KOTIGHI AI</h1>
-                <p style='color: #64748B; font-weight: 500; letter-spacing: 1px;'>PLATEFORME D'INTELLIGENCE ANALYTIQUE</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Sélecteur Mode (Custom feeling)
+        # Onglets de navigation
         mode = st.radio("Mode", ["Connexion", "Inscription"], 
                         index=0 if st.session_state.auth_mode == "Connexion" else 1,
                         horizontal=True, label_visibility="collapsed")
@@ -421,8 +414,9 @@ def page_login():
             st.session_state.auth_mode = mode
             st.rerun()
 
-        st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
 
+        # Formulaire
         if st.session_state.auth_mode == "Connexion":
             if st.session_state.tentatives >= 5:
                 st.error("🔒 Sécurité : Trop de tentatives. Compte temporairement bloqué.")
@@ -430,7 +424,7 @@ def page_login():
                 with st.form("login_form_new"):
                     login = st.text_input("Identifiant", placeholder="Nom d'utilisateur")
                     password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
-                    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
                     submitted = st.form_submit_button("S'AUTHENTIFIER")
                 
                 if submitted:
@@ -441,7 +435,7 @@ def page_login():
                         st.session_state.login_nom = login.lower()
                         st.session_state.tentatives = 0
                         st.toast("✅ Authentification réussie")
-                        time.sleep(0.8)
+                        time.sleep(0.5)
                         st.rerun()
                     else:
                         st.session_state.tentatives += 1
@@ -454,7 +448,7 @@ def page_login():
                 new_role  = st.selectbox("Type de Compte", ["Analyste Cyber", "Medecin"])
                 new_pass  = st.text_input("Mot de passe", type="password", placeholder="Minimum 8 caractères")
                 
-                st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
                 reg_submitted = st.form_submit_button("CRÉER MON ESPACE")
                 
             if reg_submitted:
@@ -471,33 +465,21 @@ def page_login():
                         }
                         st.success("✨ Compte créé avec succès !")
                         st.session_state.auth_mode = "Connexion"
-                        time.sleep(1.5)
+                        time.sleep(1)
                         st.rerun()
                 else:
                     st.error("⚠️ Veuillez remplir tous les champs")
 
-        # Pied de carte
-        st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+        # Footer
         st.markdown("""
-            <div style='text-align: center;'>
-                <span class='k-badge' style='font-size: 0.6rem;'>SÉCURISÉ PAR KOTIGHI SHIELD v3.0</span>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True) # Fin glass-card
-        
-        # Info démo sous la carte
-        st.markdown("""
-            <div style='margin-top: 2rem; text-align: center; animation: fadeIn 1.5s ease-out;'>
-                <p style='color: #64748B; font-family: "JetBrains Mono", monospace; font-size: 0.75rem; line-height: 1.6;'>
-                    ENVIRONNEMENT DE DÉMONSTRATION<br>
-                    <span style='color: #00E5FF;'>admin</span> / kotighi2024 &nbsp;•&nbsp; 
+            <div style='margin-top: 2rem; text-align: center;'>
+                <span class='k-badge' style='font-size: 0.6rem; opacity: 0.8;'>SÉCURISÉ PAR KOTIGHI SHIELD v3.0</span>
+                <p style='color: #64748B; font-family: "JetBrains Mono", monospace; font-size: 0.72rem; margin-top: 1.5rem; line-height: 1.6;'>
+                    DEMO : <span style='color: #00E5FF;'>admin</span> / kotighi2024 &nbsp;•&nbsp; 
                     <span style='color: #00E5FF;'>analyste</span> / analyse123
                 </p>
             </div>
         """, unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True) # Fin login-container
 
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
