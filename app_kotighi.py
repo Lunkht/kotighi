@@ -79,22 +79,23 @@ def get_logo_html(fill_color):
 def apply_theme():
     is_dark = st.session_state.theme == "Sombre"
     # — Premium Color Palette —
-    bg       = "#06070A" if is_dark else "#F1F5F9"
-    bg2      = "#0D0E14" if is_dark else "#E2E8F0"
-    text     = "#E2E8F0" if is_dark else "#1E293B"
-    card     = "#0F1117" if is_dark else "#FFFFFF"
-    border   = "#1C1F2E" if is_dark else "#CBD5E1"
-    subtext  = "#64748B"
-    primary  = "#00E5FF"
-    accent   = "#8B5CF6"
-    danger   = "#EF4444"
-    warning  = "#F59E0B"
-    success  = "#10B981"
-    sidebar_bg = "#0A0B10" if is_dark else "#F8FAFC"
+    # — Phase 3: Mint/Dark Dashboard Palette —
+    bg         = "#0B0E14" 
+    bg2        = "#07080B" 
+    text       = "#E2E8F0" 
+    card       = "#11151F" 
+    border     = "rgba(255,255,255,0.05)"
+    subtext    = "#64748B"
+    primary    = "#00FF88" # Neon Mint
+    accent     = "#8B5CF6"
+    danger     = "#FF4B4B"
+    warning    = "#FFAA00"
+    success    = "#00FF88"
+    sidebar_bg = "#07080B"
     
-    # Button Colors
-    btn_bg   = "#FFFFFF" if is_dark else "#1E293B"
-    btn_text = "#06070A" if is_dark else "#FFFFFF"
+    # Button & Nav Colors
+    btn_bg   = "#00FF88"
+    btn_text = "#06070A"
 
     st.markdown(f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -134,13 +135,13 @@ def apply_theme():
 
     /* ═══ GLASSMORPHISM CORE ═══ */
     .glass-card {{
-        background: rgba(15, 17, 23, 0.7) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(17, 21, 31, 0.8) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
         border-radius: 24px !important;
-        padding: 40px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        padding: 30px !important;
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45) !important;
         animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }}
 
@@ -150,71 +151,81 @@ def apply_theme():
         top: 0;
         left: 0;
         right: 0;
-        height: 70px;
-        background: rgba(6, 7, 10, 0.8) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
+        height: 80px;
+        background: {bg} !important;
         border-bottom: 1px solid {border};
         z-index: 999990;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 1.5rem;
+        padding: 0 2rem;
         animation: fadeIn 0.5s ease-out;
     }}
 
-    .bottom-nav {{
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 70px;
-        background: rgba(10, 11, 16, 0.95) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-top: 1px solid {border};
-        z-index: 999990;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding-bottom: env(safe-area-inset-bottom);
-    }}
-
-    .nav-item {{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: {subtext};
-        text-decoration: none;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        padding: 8px 12px;
+    /* Search Bar in Header */
+    .search-bar {{
+        background: rgba(255,255,255,0.03);
+        border: 1px solid {border};
         border-radius: 12px;
-        flex: 1;
-        text-align: center;
+        padding: 8px 16px;
+        width: 300px;
+        color: {subtext};
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }}
 
-    .nav-item.active {{
+    .bottom-nav {{
+        display: none !important; /* Managed by Sidebar Drawer in this view */
+    }}
+
+    /* Sidebar Navigation Pill Shape */
+    .stButton > button {{
+        background: transparent !important;
+        color: {subtext} !important;
+        border: none !important;
+        border-radius: 15px !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        font-weight: 500 !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        padding: 12px 20px !important;
+        margin-bottom: 4px !important;
+        transition: all 0.2s ease;
+    }}
+
+    .stButton > button[kind="primary"] {{
+        background: {primary} !important;
+        color: {bg2} !important;
+        box-shadow: 0 4px 15px {primary}30 !important;
+        font-weight: 700 !important;
+    }}
+
+    .stButton > button:hover {{
+        background: rgba(255,255,255,0.05) !important;
         color: {primary} !important;
+        transform: translateX(5px);
     }}
 
-    .nav-icon {{
-        font-size: 1.4rem;
-        margin-bottom: 2px;
-    }}
-
-    .nav-label {{
-        font-size: 0.65rem;
-        font-weight: 700;
+    /* Sidebar Categories */
+    .sidebar-cat {{
+        color: {subtext};
+        font-size: 0.72rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.5px;
+        margin: 24px 0 12px 12px;
     }}
 
-    /* Adjust main content for fixed bars */
+    /* Adjust main content for fixed header */
     .main-content {{
-        margin-top: 70px !important;
-        margin-bottom: 80px !important;
-        animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        margin-top: 80px !important;
+        padding: 2rem !important;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
     }}
 
     /* Hide default Streamlit elements to achieve app look */
@@ -477,6 +488,31 @@ def get_sante():
     
     return m,["COVID-19","Grippe","Problème cardiaque","Gastro-entérite","Migraine","Angine","Asthme/Stress","Symptômes non spécifiques"],conseils
 
+def simuler_diagnostic(sympt_checks):
+    ms, labels, _ = get_sante() # Get the model and labels
+    
+    # Map symptom_checks to the feature format expected by the model
+    # Ensure all expected features are present, even if not in sympt_checks
+    all_symptoms = ["fievre","toux","fatigue","maux_tete","douleur_gorge","nausees","douleur_thorax","essoufflement","diarrhee","frissons","perte_odorat","douleurs_musculaires","palpitations","vertiges"]
+    
+    feat_data = {s: int(sympt_checks.get(s, False)) for s in all_symptoms}
+    feat = pd.DataFrame([feat_data])
+    
+    pred = ms.predict(feat)[0]
+    proba = ms.predict_proba(feat)[0]
+    diag = labels[pred]
+    conf = proba[pred] * 100
+    
+    urgence = None
+    if "cardiaque" in diag.lower() or "problème cardiaque" in diag.lower():
+        urgence = "Risque cardiaque élevé. Consultez un médecin immédiatement."
+    elif "covid" in diag.lower():
+        urgence = "Possibilité de COVID-19. Isolez-vous et faites un test."
+    elif conf < 60:
+        urgence = "Faible confiance du diagnostic. Une consultation médicale est recommandée."
+    
+    return diag, urgence
+
 # ── PAGE LOGIN ────────────────────────────────────────────────────
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
@@ -593,7 +629,7 @@ def render_network_map(results):
     # Centre du réseau (KOTIGHI)
     nodes_x.append(0)
     nodes_y.append(0)
-    node_colors.append("#00E5FF")
+    node_colors.append("#00FF88")
     node_text.append("CENTRE KOTIGHI")
     
     for i, res in enumerate(results):
@@ -604,7 +640,7 @@ def render_network_map(results):
         
         nodes_x.append(x)
         nodes_y.append(y)
-        color = "#EF4444" if res['Status'] == "CRITIQUE" else ("#F59E0B" if res['Status'] == "SUSPECT" else "#10B981")
+        color = "#FF4B4B" if res['Status'] == "CRITIQUE" else ("#FFAA00" if res['Status'] == "SUSPECT" else "#00FF88")
         node_colors.append(color)
         node_text.append(f"IP: {res['IP']}<br>Score: {res['Score']}")
         
@@ -642,7 +678,7 @@ def app():
     apply_theme()
     
     user = st.session_state.utilisateur
-    pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion"]]
+    pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion", "Assistant"]]
     
     if "current_page" not in st.session_state:
         st.session_state.current_page = pages[0]
@@ -650,57 +686,60 @@ def app():
     # --- RENDER APP HEADER ---
     st.markdown(f"""
         <div class="app-header">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 32px; height: 32px;">{get_logo_html('#00E5FF')}</div>
-                <div style="font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; color: #E2E8F0;">KOTIGHI <span style="color: #00E5FF;">AI</span></div>
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <div style="font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; color: #00FF88;">Dashboard</div>
+                <div class="search-bar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    Search here...
+                </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="text-align: right; line-height: 1;">
-                    <div style="font-size: 0.85rem; font-weight: 700; color: #E2E8F0;">{user['nom']}</div>
-                    <div style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">{user['role']}</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="text-align: right; line-height: 1.2;">
+                    <div style="font-size: 0.9rem; font-weight: 700; color: #E2E8F0;">{user['nom']}</div>
+                    <div style="font-size: 0.72rem; color: #64748B;">{user['login_nom']}@gmail.com</div>
                 </div>
-                <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </div>
+                <div style="width: 44px; height: 44px; background: url('https://api.dicebear.com/7.x/avataaars/svg?seed={user['nom']}') center/cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"></div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
-    # --- RENDER BOTTOM NAVIGATION ---
-    icons = {
-        "Dashboard": "",
-        "Cybersecurite": "",
-        "Sante": "",
-        "Gestion": "",
-        "Assistant": ""
-    }
-    
-    nav_html = '<div class="bottom-nav">'
-    for p in pages:
-        active_class = "active" if st.session_state.current_page == p else ""
-        nav_html += f"""
-            <div class="nav-item {active_class}" onclick="window.parent.postMessage({{type: 'streamlit:set_page', page: '{p}'}}, '*')">
-                <div class="nav-label">{p}</div>
-            </div>
-        """
-    nav_html += '</div>'
-    
-    # Custom JS for navigation (Streamlit query param hack or hidden signal)
-    # Since onclick JS doesn't work directly on Streamlit elements without components,
-    # we use Streamlit buttons styled as nav items OR a standard Streamlit radio in a persistent sidebar.
-    # For a TRUE app look, we'll use a hidden radio or a custom component.
-    # Let's stick to a BEAUTIFUL sidebar that looks like a drawer for now, and a visible bottom bar for mobile.
-    
     # SIDEBAR
     with st.sidebar:
         st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("<div class='k-label' style='margin-bottom:12px'>NAVIGATION PRINCIPALE</div>", unsafe_allow_html=True)
         
-        # New styled navigation
-        for p in pages:
-            is_active = st.session_state.current_page == p
-            if st.button(f"{p}", key=f"nav_{p}", use_container_width=True, type="secondary" if not is_active else "primary"):
-                st.session_state.current_page = p
+        # CATEGORY: CORE
+        st.markdown("<div class='sidebar-cat'>PRINCIPAL</div>", unsafe_allow_html=True)
+        nav_items = [
+            ("Dashboard", "🏠 Dashboard"),
+            ("Assistant", "💬 Assistant AI")
+        ]
+        for page_id, label in nav_items:
+            if page_id in pages:
+                is_active = st.session_state.current_page == page_id
+                if st.button(label, key=f"nav_{page_id}", use_container_width=True, type="primary" if is_active else "secondary"):
+                    st.session_state.current_page = page_id
+                    st.rerun()
+
+        # CATEGORY: INTELLIGENCE
+        st.markdown("<div class='sidebar-cat'>INTELLIGENCE</div>", unsafe_allow_html=True)
+        nav_intel = [
+            ("Cybersecurite", "🛡️ Cybersécurité"),
+            ("Sante", "🏥 Diagnostic Santé")
+        ]
+        for page_id, label in nav_intel:
+            if page_id in pages:
+                is_active = st.session_state.current_page == page_id
+                if st.button(label, key=f"nav_{page_id}", use_container_width=True, type="primary" if is_active else "secondary"):
+                    st.session_state.current_page = page_id
+                    st.rerun()
+
+        # CATEGORY: SYSTEM
+        st.markdown("<div class='sidebar-cat'>SYSTÈME</div>", unsafe_allow_html=True)
+        if "Gestion" in pages:
+            is_active = st.session_state.current_page == "Gestion"
+            if st.button("⚙️ Paramètres", key="nav_Gestion", use_container_width=True, type="primary" if is_active else "secondary"):
+                st.session_state.current_page = "Gestion"
                 st.rerun()
         
         st.markdown("---")
@@ -725,88 +764,180 @@ def app():
     #  DASHBOARD
     # ═══════════════════════════════════════════════════════════════
     if page == "Dashboard":
-        c1, c2 = st.columns([2, 1])
+        # --- TOP ROW: KPI CARDS ---
+        c1, c2, c3, c4 = st.columns(4)
+        
         with c1:
             st.markdown(f"""
-            <div style='margin-top:0'>
-                <div class='k-badge'>TABLEAU DE BORD CENTRALISÉ</div>
-                <h1 style='margin-top:12px;font-size:2rem!important'>Bienvenue, {user['nom']}</h1>
-                <p class='k-subtext' style='font-size:.95rem;line-height:1.5;margin-bottom:20px'>
-                    Surveillance active des systèmes et état de santé global.
-                </p>
+            <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Connexions Flux</div>
+                <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
+                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>12,847</div>
+                </div>
+                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +33.45%</div>
             </div>
             """, unsafe_allow_html=True)
             
         with c2:
-            if lottie_scan:
-                st_lottie(lottie_scan, height=150, key="hero_anim_mini")
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Alertes Bloquées</div>
+                <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
+                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>1,203</div>
+                </div>
+                <div style='color:#FF4B4B; font-size:0.72rem; font-weight:700; margin-top:4px;'>↘ -15.22%</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with c3:
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Fiabilité IA</div>
+                <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
+                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>99.2%</div>
+                </div>
+                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +0.12%</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with c4:
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Vitesse Scan</div>
+                <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
+                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>1.2s</div>
+                </div>
+                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +6.55%</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        st.divider()
+        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-        # KPI CARDS
-        np.random.seed(int(time.time()))
-        c1,c2,c3,c4 = st.columns(4)
-        with c1: st.metric("Connexions analysées","12 847","+234")
-        with c2: st.metric("Attaques bloquées","1 203","+18")
-        with c3: st.metric("Diagnostics santé","452","+12")
-        with c4: st.metric("Fiabilité IA","99.2%","+0.1%")
+        # --- MIDDLE ROW: LARGE CHART & SIDE BLOCKS ---
+        col_main, col_side = st.columns([2.2, 1])
         
-        st.markdown("<br>",unsafe_allow_html=True)
-        
-        # CHARTS
-        st.markdown("#### 📈 Activité Temps Réel (24h)")
-        hours = list(range(24))
-        activity_data = pd.DataFrame({
-            "Heure": hours,
-            "Requêtes": np.random.randint(100, 500, 24),
-            "Menaces": np.random.randint(0, 50, 24)
-        })
-        fig_line = go.Figure()
-        fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Requêtes"], name="Requêtes",
-            line=dict(color="#00E5FF", width=2), fill="tozeroy",
-            fillcolor="rgba(0,229,255,0.05)"))
-        fig_line.add_trace(go.Scatter(x=hours, y=activity_data["Menaces"], name="Menaces",
-            line=dict(color="#EF4444", width=2), fill="tozeroy",
-            fillcolor="rgba(239,68,68,0.05)"))
-        fig_line.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            height=320, margin=dict(t=20, b=30, l=40, r=20),
-            legend=dict(orientation="h", y=1.12, font=dict(family="JetBrains Mono", size=11)),
-            xaxis=dict(showgrid=False, color="#64748B", title=None),
-            yaxis=dict(showgrid=True, gridcolor="rgba(28, 31, 46, 0.12)", color="#64748B", title=None),
-            font=dict(family="Inter", color="#64748B")
-        )
-        st.plotly_chart(fig_line, use_container_width=True)
+        with col_main:
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:24px; padding:24px; height:450px;'>
+                <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'>
+                    <div>
+                        <div style='color:{subtext}; font-size:0.85rem; font-weight:600;'>Flux d'Activité</div>
+                        <div style='font-size:1.8rem; font-weight:800; color:#E2E8F0;'>405,654 <span style='color:#00FF88; font-size:0.9rem;'>↗ +43.46%</span></div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Line Chart with Neon Gradient
+            hours = list(range(10))
+            data_val = [310, 330, 315, 340, 360, 355, 390, 350, 360, 355]
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=hours, y=data_val, 
+                mode='lines+markers',
+                line=dict(color="#00FF88", width=3),
+                marker=dict(size=8, color="#0B0E14", line=dict(color="#00FF88", width=2)),
+                fill='tozeroy',
+                fillcolor='rgba(0, 255, 136, 0.05)'
+            ))
+            fig.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                height=300, margin=dict(t=10, b=0, l=0, r=0),
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.03)", zeroline=False, showticklabels=True, color="#64748B"),
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("<br>",unsafe_allow_html=True)
+            st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+            
+            # --- BOTTOM LIST Section ---
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:24px; padding:24px;'>
+                <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;'>
+                    <div style='color:{subtext}; font-size:0.9rem; font-weight:700;'>LOGS RÉCENTS</div>
+                    <div style='color:{primary}; font-size:0.75rem; font-weight:700; cursor:pointer;'>VOIR TOUT</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            recent_items = [
+                ("KOTIGHI API", "System Check: Live", "10:45", "Live"),
+                ("NETWORK SCAN", "Port scanning: Complete", "09:30", "Done"),
+                ("HEALTH AI", "Biomarker analysis", "Yesterday", "PDF"),
+            ]
+            for title, desc, time_str, status in recent_items:
+                st.markdown(f"""
+                <div style='display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.03);'>
+                    <div style='display:flex; align-items:center; gap:16px;'>
+                        <div style='width:36px; height:36px; background:#00FF8820; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#00FF88;'>⚡</div>
+                        <div>
+                            <div style='color:#E2E8F0; font-size:0.9rem; font-weight:700;'>{title}</div>
+                            <div style='color:{subtext}; font-size:0.75rem;'>{desc}</div>
+                        </div>
+                    </div>
+                    <div style='text-align:right;'>
+                        <div style='color:#E2E8F0; font-size:0.8rem; font-weight:600;'>{time_str}</div>
+                        <div style='color:#00FF88; font-size:0.72rem; font-weight:700;'>{status}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with col_side:
+            # Satisfaction / Gauge Block
+            st.markdown(f"""
+            <div style='background:{card}; border:1px solid {border}; border-radius:24px; padding:24px; height:240px; margin-bottom:20px; display:flex; flex-direction:column; align-items:center;'>
+                <div style='color:{subtext}; font-size:0.85rem; font-weight:600; width:100%'>Stabilité Système</div>
+            """, unsafe_allow_html=True)
+            
+            fig_gauge = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = 75.5,
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                number = {'font': {'size': 44, 'color': '#E2E8F0', 'family': 'Inter'}},
+                gauge = {
+                    'axis': {'range': [None, 100], 'visible': False},
+                    'bar': {'color': "#00FF88", 'thickness': 0.15},
+                    'bgcolor': "rgba(255,255,255,0.03)",
+                    'borderwidth': 0,
+                }
+            ))
+            fig_gauge.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                height=180, margin=dict(t=0, b=0, l=10, r=10),
+            )
+            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Promo / Info Block
+            st.markdown(f"""
+            <div style='background:linear-gradient(180deg, {card} 0%, rgba(0,255,136,0.05) 100%); border:1px solid {border}; border-radius:24px; padding:24px; height:260px;'>
+                 <div style='color:#00FF88; font-weight:800; font-size:1.1rem; line-height:1.3; margin-top:10px;'>Évoluez vers<br>KOTIGHI PRO</div>
+                 <p style='color:{subtext}; font-size:0.82rem; margin-top:12px; line-height:1.5;'>Obtenez des analyses réseau temps-réel et des rapports médicaux détaillés en un clic.</p>
+                 <div style='margin-top:24px; background:#00FF88; color:#0B0E14; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:0.85rem; cursor:pointer;'>EN SAVOIR PLUS</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
         
         # --- ALERTS SECION ---
-        st.markdown("#### 🚨 Alertes Critiques")
+        st.markdown("#### 🚨 Alertes d'Urgence")
         alerts = [h for h in st.session_state.historique if h.get("Resultat") in ["CRITIQUE", "URGENT"] or "cardiaque" in str(h.get("Resultat")).lower()]
         
         if alerts:
-            for alert in alerts[-3:]: # Show last 3
+            for alert in alerts[-2:]: # Show last 2
                 st.markdown(f"""
-                <div class='k-alert-danger' style='margin-bottom:10px; animation: pulseGlow 2s infinite;'>
+                <div class='k-alert-danger' style='margin-bottom:10px; border-radius:16px; background:rgba(255,75,75,0.05); padding:16px;'>
                     <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <b>{alert['Module'].upper()} : {alert['Resultat']}</b>
-                        <span style='font-size:0.7rem; opacity:0.8;'>{alert['Date']}</span>
+                        <b style='color:#FF4B4B;'>{alert['Module'].upper()} : {alert['Resultat']}</b>
+                        <span style='font-size:0.7rem; color:{subtext};'>{alert['Date']}</span>
                     </div>
-                    <div style='font-size:0.8rem; margin-top:4px;'>{alert['Detail']}</div>
+                    <div style='font-size:0.85rem; margin-top:4px;'>{alert['Detail']}</div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.success("Aucune menace critique détectée. Tous les systèmes sont au vert.")
-
-        st.markdown("<br>",unsafe_allow_html=True)
-        
-        # RECENT ACTIVITY
-        st.markdown("#### 🕒 Dernières Activités")
-        if st.session_state.historique:
-            df_hist = pd.DataFrame(st.session_state.historique[::-1]).head(5)
-            st.dataframe(df_hist,use_container_width=True,hide_index=True)
-        else:
-            st.info("Aucune activité récente.")
+            st.markdown(f"<p style='color:{subtext}; font-style:italic;'>Aucune alerte critique.</p>", unsafe_allow_html=True)
+    
+    # ═══════════════════════════════════════════════════════════════
     
     # ═══════════════════════════════════════════════════════════════
     #  CYBERSECURITE — SOC TERMINAL
@@ -1135,17 +1266,18 @@ def app():
                 content = message["content"]
                 if role == "user":
                     st.markdown(f"""
-                    <div style='display:flex; justify-content:flex-end; margin-bottom:10px;'>
-                        <div style='background:rgba(255,255,255,0.05); padding:12px 18px; border-radius:15px; max-width:80%; border:1px solid rgba(255,255,255,0.1); color:#E2E8F0;'>
+                    <div style='display:flex; justify-content:flex-end; margin-bottom:12px;'>
+                        <div style='background:rgba(255,255,255,0.03); padding:14px 20px; border-radius:18px 18px 4px 18px; max-width:80%; border:1px solid rgba(255,255,255,0.08); color:#E2E8F0; font-size:0.9rem;'>
                             {content}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown(f"""
-                    <div style='display:flex; justify-content:flex-start; margin-bottom:10px;'>
-                        <div style='background:rgba(0, 229, 255, 0.05); padding:12px 18px; border-radius:15px; max-width:80%; border:1px solid rgba(0, 229, 255, 0.1); color:#00E5FF;'>
-                            <b>IA:</b><br>{content}
+                    <div style='display:flex; justify-content:flex-start; margin-bottom:12px;'>
+                        <div style='background:rgba(0, 255, 136, 0.05); padding:14px 20px; border-radius:18px 18px 18px 4px; max-width:80%; border:1px solid rgba(0, 255, 136, 0.15); color:#00FF88; font-size:0.9rem;'>
+                            <b style='font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:4px;'>Kotighi AI</b>
+                            {content}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
