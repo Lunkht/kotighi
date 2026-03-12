@@ -78,22 +78,22 @@ def get_logo_html(fill_color):
 def apply_theme():
     is_dark = st.session_state.theme == "Sombre"
     # — Premium Color Palette —
-    # — Phase 3: Mint/Dark Dashboard Palette —
+    # — Phase 4: Monochromatic Dashboard Palette —
     bg         = "#0B0E14" 
     bg2        = "#07080B" 
     text       = "#E2E8F0" 
     card       = "#11151F" 
     border     = "rgba(255,255,255,0.05)"
-    subtext    = "#64748B"
-    primary    = "#00FF88" # Neon Mint
-    accent     = "#8B5CF6"
-    danger     = "#FF4B4B"
-    warning    = "#FFAA00"
-    success    = "#00FF88"
+    subtext    = "#B4C6EF"
+    primary    = "#FFFFFF" # White
+    accent     = "#64748B"
+    danger     = "#E2E8F0"
+    warning    = "#64748B"
+    success    = "#FFFFFF"
     sidebar_bg = "#07080B"
     
     # Button & Nav Colors
-    btn_bg   = "#00FF88"
+    btn_bg   = "#FFFFFF"
     btn_text = "#06070A"
 
     st.markdown(f"""<style>
@@ -198,7 +198,7 @@ def apply_theme():
     .stButton > button[kind="primary"] {{
         background: {primary} !important;
         color: {bg2} !important;
-        box-shadow: 0 4px 15px {primary}30 !important;
+        box-shadow: 0 4px 15px rgba(255,255,255,0.1) !important;
         font-weight: 700 !important;
     }}
 
@@ -628,7 +628,7 @@ def render_network_map(results):
     # Centre du réseau (KOTIGHI)
     nodes_x.append(0)
     nodes_y.append(0)
-    node_colors.append("#00FF88")
+    node_colors.append("#FFFFFF")
     node_text.append("CENTRE KOTIGHI")
     
     for i, res in enumerate(results):
@@ -639,7 +639,7 @@ def render_network_map(results):
         
         nodes_x.append(x)
         nodes_y.append(y)
-        color = "#FF4B4B" if res['Status'] == "CRITIQUE" else ("#FFAA00" if res['Status'] == "SUSPECT" else "#00FF88")
+        color = "#FFFFFF" if res['Status'] == "CRITIQUE" else ("#B4C6EF" if res['Status'] == "SUSPECT" else "#64748B")
         node_colors.append(color)
         node_text.append(f"IP: {res['IP']}<br>Score: {res['Score']}")
         
@@ -686,10 +686,10 @@ def app():
     st.markdown(f"""
         <div class="app-header">
             <div style="display: flex; align-items: center; gap: 40px;">
-                <div style="font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; color: #00FF88;">Dashboard</div>
+                <div style="font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; color: #FFFFFF;">DASHBOARD</div>
                 <div class="search-bar">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    Search here...
+                    RECHERCHER
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 20px;">
@@ -710,8 +710,8 @@ def app():
         # CATEGORY: CORE
         st.markdown("<div class='sidebar-cat'>PRINCIPAL</div>", unsafe_allow_html=True)
         nav_items = [
-            ("Dashboard", "🏠 Dashboard"),
-            ("Assistant", "💬 Assistant AI")
+            ("Dashboard", "DASHBOARD"),
+            ("Assistant", "ASSISTANT AI")
         ]
         for page_id, label in nav_items:
             if page_id in pages:
@@ -723,8 +723,8 @@ def app():
         # CATEGORY: INTELLIGENCE
         st.markdown("<div class='sidebar-cat'>INTELLIGENCE</div>", unsafe_allow_html=True)
         nav_intel = [
-            ("Cybersecurite", "🛡️ Cybersécurité"),
-            ("Sante", "🏥 Diagnostic Santé")
+            ("Cybersecurite", "CYBERSÉCURITÉ"),
+            ("Sante", "DIAGNOSTIC SANTÉ")
         ]
         for page_id, label in nav_intel:
             if page_id in pages:
@@ -737,7 +737,7 @@ def app():
         st.markdown("<div class='sidebar-cat'>SYSTÈME</div>", unsafe_allow_html=True)
         if "Gestion" in pages:
             is_active = st.session_state.current_page == "Gestion"
-            if st.button("⚙️ Paramètres", key="nav_Gestion", use_container_width=True, type="primary" if is_active else "secondary"):
+            if st.button("PARAMÈTRES", key="nav_Gestion", use_container_width=True, type="primary" if is_active else "secondary"):
                 st.session_state.current_page = "Gestion"
                 st.rerun()
         
@@ -750,7 +750,7 @@ def app():
             st.session_state.theme = theme_choice
             st.rerun()
             
-        if st.button("🚪 Déconnexion", use_container_width=True):
+        if st.button("DÉCONNEXION", use_container_width=True):
             st.session_state.connecte = False
             st.rerun()
 
@@ -769,44 +769,44 @@ def app():
         with c1:
             st.markdown(f"""
             <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
-                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Connexions Flux</div>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>CONNEXIONS FLUX</div>
                 <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
                     <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>12,847</div>
                 </div>
-                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +33.45%</div>
+                <div style='color:#E2E8F0; font-size:0.72rem; font-weight:700; margin-top:4px;'>+33.45%</div>
             </div>
             """, unsafe_allow_html=True)
             
         with c2:
             st.markdown(f"""
             <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
-                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Alertes Bloquées</div>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>ALERTES BLOQUÉES</div>
                 <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
                     <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>1,203</div>
                 </div>
-                <div style='color:#FF4B4B; font-size:0.72rem; font-weight:700; margin-top:4px;'>↘ -15.22%</div>
+                <div style='color:#E2E8F0; font-size:0.72rem; font-weight:700; margin-top:4px;'>-15.22%</div>
             </div>
             """, unsafe_allow_html=True)
             
         with c3:
             st.markdown(f"""
             <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
-                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Fiabilité IA</div>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>FIABILITÉ IA</div>
                 <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
                     <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>99.2%</div>
                 </div>
-                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +0.12%</div>
+                <div style='color:#E2E8F0; font-size:0.72rem; font-weight:700; margin-top:4px;'>+0.12%</div>
             </div>
             """, unsafe_allow_html=True)
             
         with c4:
             st.markdown(f"""
             <div style='background:{card}; border:1px solid {border}; border-radius:16px; padding:20px;'>
-                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>Vitesse Scan</div>
+                <div style='color:{subtext}; font-size:0.8rem; font-weight:600;'>VITESSE SCAN</div>
                 <div style='display:flex; align-items:baseline; gap:8px; margin-top:8px;'>
-                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>1.2s</div>
+                    <div style='font-size:1.6rem; font-weight:800; color:#E2E8F0;'>1.2S</div>
                 </div>
-                <div style='color:#00FF88; font-size:0.72rem; font-weight:700; margin-top:4px;'>↗ +6.55%</div>
+                <div style='color:#E2E8F0; font-size:0.72rem; font-weight:700; margin-top:4px;'>+6.55%</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -820,23 +820,23 @@ def app():
             <div style='background:{card}; border:1px solid {border}; border-radius:24px; padding:24px; height:450px;'>
                 <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'>
                     <div>
-                        <div style='color:{subtext}; font-size:0.85rem; font-weight:600;'>Flux d'Activité</div>
-                        <div style='font-size:1.8rem; font-weight:800; color:#E2E8F0;'>405,654 <span style='color:#00FF88; font-size:0.9rem;'>↗ +43.46%</span></div>
+                        <div style='color:{subtext}; font-size:0.85rem; font-weight:600;'>FLUX D'ACTIVITÉ</div>
+                        <div style='font-size:1.8rem; font-weight:800; color:#E2E8F0;'>405,654 <span style='color:#E2E8F0; font-size:0.9rem;'>+43.46%</span></div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
             
-            # Line Chart with Neon Gradient
+            # Line Chart with Monochromatic Scale
             hours = list(range(10))
             data_val = [310, 330, 315, 340, 360, 355, 390, 350, 360, 355]
             fig = go.Figure()
             fig.add_trace(go.Scatter(
                 x=hours, y=data_val, 
                 mode='lines+markers',
-                line=dict(color="#00FF88", width=3),
-                marker=dict(size=8, color="#0B0E14", line=dict(color="#00FF88", width=2)),
+                line=dict(color="#FFFFFF", width=3),
+                marker=dict(size=8, color="#0B0E14", line=dict(color="#FFFFFF", width=2)),
                 fill='tozeroy',
-                fillcolor='rgba(0, 255, 136, 0.05)'
+                fillcolor='rgba(255, 255, 255, 0.05)'
             ))
             fig.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -867,7 +867,7 @@ def app():
                 st.markdown(f"""
                 <div style='display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.03);'>
                     <div style='display:flex; align-items:center; gap:16px;'>
-                        <div style='width:36px; height:36px; background:#00FF8820; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#00FF88;'>⚡</div>
+                        <div style='width:36px; height:36px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:0.75rem; font-weight:800;'>IA</div>
                         <div>
                             <div style='color:#E2E8F0; font-size:0.9rem; font-weight:700;'>{title}</div>
                             <div style='color:{subtext}; font-size:0.75rem;'>{desc}</div>
@@ -875,7 +875,7 @@ def app():
                     </div>
                     <div style='text-align:right;'>
                         <div style='color:#E2E8F0; font-size:0.8rem; font-weight:600;'>{time_str}</div>
-                        <div style='color:#00FF88; font-size:0.72rem; font-weight:700;'>{status}</div>
+                        <div style='color:#FFFFFF; font-size:0.72rem; font-weight:700;'>{status}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -895,7 +895,7 @@ def app():
                 number = {'font': {'size': 44, 'color': '#E2E8F0', 'family': 'Inter'}},
                 gauge = {
                     'axis': {'range': [None, 100], 'visible': False},
-                    'bar': {'color': "#00FF88", 'thickness': 0.15},
+                    'bar': {'color': "#FFFFFF", 'thickness': 0.15},
                     'bgcolor': "rgba(255,255,255,0.03)",
                     'borderwidth': 0,
                 }
@@ -909,28 +909,27 @@ def app():
             
             # Promo / Info Block
             st.markdown(f"""
-            <div style='background:linear-gradient(180deg, {card} 0%, rgba(0,255,136,0.05) 100%); border:1px solid {border}; border-radius:24px; padding:24px; height:260px;'>
-                 <div style='color:#00FF88; font-weight:800; font-size:1.1rem; line-height:1.3; margin-top:10px;'>Évoluez vers<br>KOTIGHI PRO</div>
+            <div style='background:linear-gradient(180deg, {card} 0%, rgba(255,255,255,0.02) 100%); border:1px solid {border}; border-radius:24px; padding:24px; height:260px;'>
+                 <div style='color:#FFFFFF; font-weight:800; font-size:1.1rem; line-height:1.3; margin-top:10px;'>ÉVOLUEZ VERS<br>KOTIGHI PRO</div>
                  <p style='color:{subtext}; font-size:0.82rem; margin-top:12px; line-height:1.5;'>Obtenez des analyses réseau temps-réel et des rapports médicaux détaillés en un clic.</p>
-                 <div style='margin-top:24px; background:#00FF88; color:#0B0E14; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:0.85rem; cursor:pointer;'>EN SAVOIR PLUS</div>
+                 <div style='margin-top:24px; background:#FFFFFF; color:#0B0E14; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:0.85rem; cursor:pointer;'>EN SAVOIR PLUS</div>
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
         
         # --- ALERTS SECION ---
-        st.markdown("#### 🚨 Alertes d'Urgence")
+        st.markdown("#### ALERTES D'URGENCE")
         alerts = [h for h in st.session_state.historique if h.get("Resultat") in ["CRITIQUE", "URGENT"] or "cardiaque" in str(h.get("Resultat")).lower()]
         
         if alerts:
             for alert in alerts[-2:]: # Show last 2
                 st.markdown(f"""
-                <div class='k-alert-danger' style='margin-bottom:10px; border-radius:16px; background:rgba(255,75,75,0.05); padding:16px;'>
+                <div class='k-alert-danger' style='margin-bottom:10px; border-radius:16px; background:rgba(255,255,255,0.05); padding:16px; border:1px solid rgba(255,255,255,0.1);'>
                     <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <b style='color:#FF4B4B;'>{alert['Module'].upper()} : {alert['Resultat']}</b>
+                        <b style='color:#FFFFFF;'>{alert['Module'].upper()} : {alert['Resultat']}</b>
                         <span style='font-size:0.7rem; color:{subtext};'>{alert['Date']}</span>
                     </div>
-                    <div style='font-size:0.85rem; margin-top:4px;'>{alert['Detail']}</div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
@@ -964,10 +963,10 @@ def app():
                 
                 # Boutons +/- pour ajouter/retirer des champs
                 c_add, c_rem, _ = st.columns([1, 1, 4])
-                if c_add.button("➕ Ajouter", key="add_ip"): 
+                if c_add.button("AJOUTER CIBLE", key="add_ip"): 
                     st.session_state.ip_count += 1
                     st.rerun()
-                if c_rem.button("➖ Retirer", key="rem_ip") and st.session_state.ip_count > 1: 
+                if c_rem.button("RETIRER CIBLE", key="rem_ip") and st.session_state.ip_count > 1: 
                     st.session_state.ip_count -= 1
                     st.rerun()
                 
@@ -1098,15 +1097,15 @@ def app():
             st.progress(45)
 
     # ═══════════════════════════════════════════════════════════════
-    #  SANTÉ — MODULE CLINIQUE
+    #  SANTE — MODULE CLINIQUE
     # ═══════════════════════════════════════════════════════════════
     elif page == "Sante":
         st.markdown(f"""
             <div style='display:flex; justify-content:space-between; align-items:center;'>
-                <h2 style='margin:0;'>Diagnostic Santé IA</h2>
-                <div style='background:rgba(0,255,136,0.1); color:#00FF88; padding:6px 14px; border-radius:30px; font-size:0.75rem; font-weight:800; border:1px solid rgba(0,255,136,0.2);'>MOTEUR v2.4</div>
+                <h2 style='margin:0;'>DIAGNOSTIC SANTÉ IA</h2>
+                <div style='background:rgba(255,255,255,0.05); color:#FFFFFF; padding:6px 14px; border-radius:30px; font-size:0.75rem; font-weight:800; border:1px solid rgba(255,255,255,0.1);'>MOTEUR v2.4</div>
             </div>
-            <p style='color:{subtext}; font-size:0.9rem; margin-top:10px;'>Analyse prédictive basée sur les symptômes et l'historique patient.</p>
+            <p style='color:{subtext}; font-size:0.9rem; margin-top:10px;'>Analyse prédictive basée sur les symptômes et l'historique.</p>
         """, unsafe_allow_html=True)
         st.divider()
         
@@ -1181,7 +1180,7 @@ def app():
                         
                         # Logique d'urgence
                         is_urgent = "cardiaque" in diag.lower() or "covid" in diag.lower() or conf < 60
-                        color_res = "#EF4444" if is_urgent else ("#F59E0B" if conf < 80 else "#10B981")
+                        color_res = "#FFFFFF" # Monochromatic
                         
                         # SVG Icons
                         svg_alert = """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>"""
@@ -1200,7 +1199,7 @@ def app():
                         """, unsafe_allow_html=True)
                         
                         # Section Conseils
-                        st.markdown("#### 💡 RECOMMANDATIONS")
+                        st.markdown("#### RECOMMANDATIONS")
                         if diag in conseils_prev:
                             for c in conseils_prev[diag]:
                                 st.info(f"{c}")
@@ -1208,7 +1207,7 @@ def app():
                             st.info("Consultez un médecin pour un avis professionnel.")
                             
                         if is_urgent:
-                            st.error("⚠️ SITUATION CRITIQUE : CONTACTEZ LES SECOURS (15)")
+                            st.error("SITUATION CRITIQUE : CONTACTEZ LES SECOURS (15)")
                         
                         # Rapport PDF
                         try:
@@ -1280,8 +1279,8 @@ def app():
                 else:
                     st.markdown(f"""
                     <div style='display:flex; justify-content:flex-start; margin-bottom:12px;'>
-                        <div style='background:rgba(0, 255, 136, 0.05); padding:14px 20px; border-radius:18px 18px 18px 4px; max-width:80%; border:1px solid rgba(0, 255, 136, 0.15); color:#00FF88; font-size:0.9rem;'>
-                            <b style='font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:4px;'>Kotighi AI</b>
+                        <div style='background:rgba(255, 255, 255, 0.05); padding:14px 20px; border-radius:18px 18px 18px 4px; max-width:80%; border:1px solid rgba(255, 255, 255, 0.1); color:#FFFFFF; font-size:0.9rem;'>
+                            <b style='font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:4px;'>KOTIGHI AI</b>
                             {content}
                         </div>
                     </div>
@@ -1295,18 +1294,18 @@ def app():
             if submitted and user_input:
                 st.session_state.chat_history.append({"role": "user", "content": user_input})
                 
-                # Logique de réponse simple basée sur des mots clés
+                # Logique de réponse simple
                 q = user_input.lower()
                 response = ""
                 
                 if "réseau" in q or "ip" in q or "attaque" in q or "cyber" in q:
-                    response = "D'après les dernières analyses, le trafic réseau est stable. Cependant, je surveille 3 IPs suspectes. Souhaitez-vous lancer un scan approfondi ?"
+                    response = "ANALYSE : Flux stable. 3 IPs sous surveillance. Voulez-vous un scan profond ?"
                 elif "santé" in q or "docteur" in q or "symptôme" in q or "malade" in q:
-                    response = "Je peux vous aider à identifier des symptômes. Pourriez-vous me préciser si vous avez de la fièvre ou des douleurs ?"
+                    response = "ANALYSE : Je peux aider au diagnostic. Avez-vous de la fièvre ?"
                 elif "qui es-tu" in q:
-                    response = "Je suis l'Assistant KOTIGHI AI, votre expert en cybersécurité et analyse de santé."
+                    response = "INFO : Assistant KOTIGHI AI, expert en cybersécurité et santé."
                 else:
-                    response = "Je traite votre demande... Pouvez-vous préciser si cela concerne la cybersécurité ou un diagnostic de santé ?"
+                    response = "INFO : Précisez votre demande (Cyber ou Santé)."
                 
                 st.session_state.chat_history.append({"role": "assistant", "content": response})
                 st.rerun()
