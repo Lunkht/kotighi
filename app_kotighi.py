@@ -264,7 +264,7 @@ def apply_theme():
 
     /* ═══ BUTTONS ═══ */
     .stButton > button {{
-        background: linear-gradient(135deg, {primary}, {accent}) !important;
+        background: {primary} !important;
         color: #000 !important;
         border: none !important;
         border-radius: 12px;
@@ -598,10 +598,10 @@ def app():
 
     # --- RENDER BOTTOM NAVIGATION ---
     icons = {
-        "Dashboard": "🏠",
-        "Cybersecurite": "🛡️",
-        "Sante": "🏥",
-        "Gestion": "⚙️"
+        "Dashboard": "",
+        "Cybersecurite": "",
+        "Sante": "",
+        "Gestion": ""
     }
     
     nav_html = '<div class="bottom-nav">'
@@ -609,7 +609,6 @@ def app():
         active_class = "active" if st.session_state.current_page == p else ""
         nav_html += f"""
             <div class="nav-item {active_class}" onclick="window.parent.postMessage({{type: 'streamlit:set_page', page: '{p}'}}, '*')">
-                <div class="nav-icon">{icons.get(p, '📄')}</div>
                 <div class="nav-label">{p}</div>
             </div>
         """
@@ -629,7 +628,7 @@ def app():
         # New styled navigation
         for p in pages:
             is_active = st.session_state.current_page == p
-            if st.button(f"{icons.get(p, '📄')} {p}", key=f"nav_{p}", use_container_width=True, type="secondary" if not is_active else "primary"):
+            if st.button(f"{p}", key=f"nav_{p}", use_container_width=True, type="secondary" if not is_active else "primary"):
                 st.session_state.current_page = p
                 st.rerun()
         
@@ -1044,7 +1043,7 @@ def app():
     # --- RENDER BOTTOM NAVIGATION (VISUAL ONLY) ---
     st.markdown(f"""
         <div class="bottom-nav">
-            {"".join([f'<div class="nav-item {"active" if st.session_state.current_page == p else ""}"><div class="nav-icon">{icons.get(p, "📄")}</div><div class="nav-label">{p}</div></div>' for p in pages])}
+            {"".join([f'<div class="nav-item {"active" if st.session_state.current_page == p else ""}"><div class="nav-label">{p}</div></div>' for p in pages])}
         </div>
     """, unsafe_allow_html=True)
 
