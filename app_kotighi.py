@@ -125,6 +125,7 @@ def apply_theme():
 
     /* ═══ SIDEBAR ═══ */
     [data-testid="stSidebar"] {{
+        display: flex !important;
         background: {sidebar_bg} !important;
         border-right: 1px solid {border} !important;
     }}
@@ -233,10 +234,7 @@ def apply_theme():
         border-bottom: none !important;
     }}
     
-    [data-testid="stSidebar"] {{
-        background: {sidebar_bg} !important;
-        border-right: 1px solid {border} !important;
-    }}
+
 
     /* ═══ METRIC CARDS ═══ */
     [data-testid="metric-container"] {{
@@ -525,8 +523,8 @@ def page_login():
     # Arrière-plan immersif
     st.markdown("""
         <div style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-                    background: radial-gradient(circle at 20% 30%, #00E5FF15 0%, transparent 50%),
-                                radial-gradient(circle at 80% 70%, #8B5CF615 0%, transparent 50%),
+                    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 50%),
+                                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0%, transparent 50%),
                                 #06070A;'>
         </div>
     """, unsafe_allow_html=True)
@@ -534,7 +532,7 @@ def page_login():
     # Header central
     st.markdown(f"""
         <div style='text-align: center; padding-top: 10vh; margin-bottom: 2rem;'>
-            <div style='width: 150px; margin: 0 auto 1rem;'>{get_logo_html('#00E5FF')}</div>
+            <div style='width: 150px; margin: 0 auto 1rem;'>{get_logo_html('#FFFFFF')}</div>
             <p style='color: #64748B; font-weight: 500; letter-spacing: 1.5px; font-size: 0.75rem; text-transform: uppercase;'>Plateforme d'Intelligence Analytique</p>
         </div>
     """, unsafe_allow_html=True)
@@ -557,7 +555,7 @@ def page_login():
         # Formulaire
         if st.session_state.auth_mode == "Connexion":
             if st.session_state.tentatives >= 5:
-                st.error("🔒 Sécurité : Trop de tentatives. Compte temporairement bloqué.")
+                st.error("SÉCURITÉ : Trop de tentatives. Compte temporairement bloqué.")
             else:
                 with st.form("login_form_new"):
                     login = st.text_input("Identifiant", placeholder="Nom d'utilisateur")
@@ -572,12 +570,12 @@ def page_login():
                         st.session_state.utilisateur = user
                         st.session_state.login_nom = login.lower()
                         st.session_state.tentatives = 0
-                        st.toast("✅ Authentification réussie")
+                        st.toast("AUTHENTIFICATION RÉUSSIE")
                         time.sleep(0.5)
                         st.rerun()
                     else:
                         st.session_state.tentatives += 1
-                        st.error("❌ Identifiants invalides")
+                        st.error("IDENTIFIANTS INVALIDES")
         
         else:
             with st.form("register_form_new"):
@@ -1358,10 +1356,7 @@ def app():
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
-    # On masque la sidebar sur la page de login
-    st.markdown("""<style>
-    [data-testid="stSidebar"] { display: none; }
-    </style>""", unsafe_allow_html=True)
+    st.markdown("<style>[data-testid='stSidebar'] { display: none !important; }</style>", unsafe_allow_html=True)
     apply_theme()
     page_login()
 else:
