@@ -52,9 +52,9 @@ def mask_data(data):
 
 # On garde le dictionnaire USERS en fallback si PG n'est pas dispo
 USERS = {
-    "admin":    {"hash":h("kotighi2024"),"role":"Administrateur","nom":"Admin Principal",   "acces":["Dashboard","Cybersecurite","Sante","Gestion"]},
-    "analyste": {"hash":h("analyse123"), "role":"Analyste Cyber", "nom":"Jean Dupont",      "acces":["Dashboard","Cybersecurite"]},
-    "medecin":  {"hash":h("sante456"),   "role":"Medecin",        "nom":"Dr. House",        "acces":["Dashboard","Sante"]},
+    "admin":    {"hash":h("kotighi2024"),"role":"Administrateur","nom":"Admin Principal",   "acces":["Dashboard","Cybersecurite","Sante","Gestion","Assistant"]},
+    "analyste": {"hash":h("analyse123"), "role":"Analyste Cyber", "nom":"Jean Dupont",      "acces":["Dashboard","Cybersecurite","Assistant"]},
+    "medecin":  {"hash":h("sante456"),   "role":"Medecin",        "nom":"Dr. House",        "acces":["Dashboard","Sante","Assistant"]},
 }
 
 def verifier(login, mdp):
@@ -62,7 +62,7 @@ def verifier(login, mdp):
     if l in USERS and USERS[l]["hash"] == h(mdp): return USERS[l]
     return None
 
-for k,v in {"connecte":False,"utilisateur":None,"login_nom":None,"tentatives":0,"historique":[],"theme":"Sombre"}.items():
+for k,v in {"connecte":False,"utilisateur":None,"login_nom":None,"tentatives":0,"historique":[],"theme":"Sombre", "chat_history": []}.items():
     if k not in st.session_state: st.session_state[k] = v
 
 # ── THEME CSS ────────────────────────────────────────────────────
@@ -605,7 +605,8 @@ def app():
         "Dashboard": "",
         "Cybersecurite": "",
         "Sante": "",
-        "Gestion": ""
+        "Gestion": "",
+        "Assistant": ""
     }
     
     nav_html = '<div class="bottom-nav">'
@@ -1016,6 +1017,61 @@ def app():
                     <p class='k-subtext' style='font-size:.85rem'>Veuillez remplir le formulaire à gauche.</p>
                 </div>
                 """, unsafe_allow_html=True)
+
+    # ═══════════════════════════════════════════════════════════════
+    #  ASSISTANT AI
+    # ═══════════════════════════════════════════════════════════════
+    elif page == "Assistant":
+        st.markdown("## KOTIGHI ASSISTANT", unsafe_allow_html=True)
+        st.divider()
+
+        # Conteneur de chat
+        chat_container = st.container()
+        
+        with chat_container:
+            for message in st.session_state.chat_history:
+                role = message["role"]
+                content = message["content"]
+                if role == "user":
+                    st.markdown(f"""
+                    <div style='display:flex; justify-content:flex-end; margin-bottom:10px;'>
+                        <div style='background:rgba(255,255,255,0.05); padding:12px 18px; border-radius:15px; max-width:80%; border:1px solid rgba(255,255,255,0.1); color:#E2E8F0;'>
+                            {content}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div style='display:flex; justify-content:flex-start; margin-bottom:10px;'>
+                        <div style='background:rgba(0, 229, 255, 0.05); padding:12px 18px; border-radius:15px; max-width:80%; border:1px solid rgba(0, 229, 255, 0.1); color:#00E5FF;'>
+                            <b>IA:</b><br>{content}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        # Zone d'input (en bas) fixée simulée
+        with st.form("chat_input", clear_on_submit=True):
+            user_input = st.text_input("Posez votre question...", placeholder="Ex: Risques de sécurité sur 192.168.1.1 ou Symptômes grippe")
+            submitted = st.form_submit_button("ENVOYER")
+            
+            if submitted and user_input:
+                st.session_state.chat_history.append({"role": "user", "content": user_input})
+                
+                # Logique de réponse simple basée sur des mots clés
+                q = user_input.lower()
+                response = ""
+                
+                if "réseau" in q or "ip" in q or "attaque" in q or "cyber" in q:
+                    response = "D'après les dernières analyses, le trafic réseau est stable. Cependant, je surveille 3 IPs suspectes. Souhaitez-vous lancer un scan approfondi ?"
+                elif "santé" in q or "docteur" in q or "symptôme" in q or "malade" in q:
+                    response = "Je peux vous aider à identifier des symptômes. Pourriez-vous me préciser si vous avez de la fièvre ou des douleurs ?"
+                elif "qui es-tu" in q:
+                    response = "Je suis l'Assistant KOTIGHI AI, votre expert en cybersécurité et analyse de santé."
+                else:
+                    response = "Je traite votre demande... Pouvez-vous préciser si cela concerne la cybersécurité ou un diagnostic de santé ?"
+                
+                st.session_state.chat_history.append({"role": "assistant", "content": response})
+                st.rerun()
 
     # ═══════════════════════════════════════════════════════════════
     #  GESTION
