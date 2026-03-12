@@ -140,6 +140,90 @@ def apply_theme():
         animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }}
 
+    /* ═══ APP STRUCTURE ═══ */
+    .app-header {{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: rgba(6, 7, 10, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid {border};
+        z-index: 999990;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        animation: fadeIn 0.5s ease-out;
+    }}
+
+    .bottom-nav {{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: rgba(10, 11, 16, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-top: 1px solid {border};
+        z-index: 999990;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom);
+    }}
+
+    .nav-item {{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: {subtext};
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 12px;
+        flex: 1;
+        text-align: center;
+    }}
+
+    .nav-item.active {{
+        color: {primary} !important;
+    }}
+
+    .nav-icon {{
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+    }}
+
+    .nav-label {{
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }}
+
+    /* Adjust main content for fixed bars */
+    .main-content {{
+        margin-top: 70px !important;
+        margin-bottom: 80px !important;
+        animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }}
+
+    /* Hide default Streamlit elements to achieve app look */
+    header[data-testid="stHeader"] {{
+        background: transparent !important;
+        border-bottom: none !important;
+    }}
+    
+    [data-testid="stSidebar"] {{
+        background: {sidebar_bg} !important;
+        border-right: 1px solid {border} !important;
+    }}
+
     /* ═══ METRIC CARDS ═══ */
     [data-testid="metric-container"] {{
         background: {card} !important;
@@ -484,44 +568,72 @@ def page_login():
 
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
-    # Application du thème globalement (sur toutes les pages)
+    # Application du thème globalement
     apply_theme()
+    
+    user = st.session_state.utilisateur
+    pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion"]]
+    
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = pages[0]
 
+    # --- RENDER APP HEADER ---
+    st.markdown(f"""
+        <div class="app-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px;">{get_logo_html('#00E5FF')}</div>
+                <div style="font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; color: #E2E8F0;">KOTIGHI <span style="color: #00E5FF;">AI</span></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right; line-height: 1;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #E2E8F0;">{user['nom']}</div>
+                    <div style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">{user['role']}</div>
+                </div>
+                <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # --- RENDER BOTTOM NAVIGATION ---
+    icons = {
+        "Dashboard": "🏠",
+        "Cybersecurite": "🛡️",
+        "Sante": "🏥",
+        "Gestion": "⚙️"
+    }
+    
+    nav_html = '<div class="bottom-nav">'
+    for p in pages:
+        active_class = "active" if st.session_state.current_page == p else ""
+        nav_html += f"""
+            <div class="nav-item {active_class}" onclick="window.parent.postMessage({{type: 'streamlit:set_page', page: '{p}'}}, '*')">
+                <div class="nav-icon">{icons.get(p, '📄')}</div>
+                <div class="nav-label">{p}</div>
+            </div>
+        """
+    nav_html += '</div>'
+    
+    # Custom JS for navigation (Streamlit query param hack or hidden signal)
+    # Since onclick JS doesn't work directly on Streamlit elements without components,
+    # we use Streamlit buttons styled as nav items OR a standard Streamlit radio in a persistent sidebar.
+    # For a TRUE app look, we'll use a hidden radio or a custom component.
+    # Let's stick to a BEAUTIFUL sidebar that looks like a drawer for now, and a visible bottom bar for mobile.
+    
     # SIDEBAR
     with st.sidebar:
-        # LOGO -> ICONE UTILISATEUR
-        c_logo, _ = st.columns([1, 0.1])
-        with c_logo:
-            # Icône utilisateur SVG simple et élégante
-            st.markdown("""
-            <div style='text-align:center; margin-bottom: 10px;'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color:#64748B; background:rgba(255,255,255,0.05); border-radius:50%; padding:15px;">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        st.markdown("""<div style='text-align:center;padding-bottom:20px'>
-            <div class='k-badge' style='margin:6px auto;display:inline-flex;border-color:transparent;background:transparent;color:#64748B'>V3.0 · ENTERPRISE</div>
-        </div>""", unsafe_allow_html=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<div class='k-label' style='margin-bottom:12px'>NAVIGATION PRINCIPALE</div>", unsafe_allow_html=True)
         
-        # User Profile Card (Simplifié)
-        user = st.session_state.utilisateur
-        st.markdown(f"""
-        <div style='text-align:center; margin-bottom:20px'>
-            <div style='font-size:1.1rem; font-weight:700; color:{'#E2E8F0' if st.session_state.theme == "Sombre" else '#1E293B'}'>{user['nom']}</div>
-            <div style='font-size:0.8rem; color:#64748B; text-transform:uppercase; letter-spacing:1px'>{user['role']}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion"]]
-        page = st.radio("Navigation", pages, label_visibility="collapsed")
+        # New styled navigation
+        for p in pages:
+            is_active = st.session_state.current_page == p
+            if st.button(f"{icons.get(p, '📄')} {p}", key=f"nav_{p}", use_container_width=True, type="secondary" if not is_active else "primary"):
+                st.session_state.current_page = p
+                st.rerun()
         
         st.markdown("---")
-        
-        # SWITCH DE THÈME (Dans la Sidebar, en bas)
-        st.markdown("<div class='k-label' style='margin-bottom:8px'>APPARENCE</div>", unsafe_allow_html=True)
         theme_choice = st.radio("Thème", ["Sombre", "Clair"], 
                               index=0 if st.session_state.theme == "Sombre" else 1,
                               horizontal=True, label_visibility="collapsed", key="theme_sidebar")
@@ -530,11 +642,14 @@ def app():
             st.session_state.theme = theme_choice
             st.rerun()
             
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        if st.button("🚪 Se déconnecter", use_container_width=True):
+        if st.button("🚪 Déconnexion", use_container_width=True):
             st.session_state.connecte = False
             st.rerun()
+
+    # MAIN CONTENT WRAPPER
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    
+    page = st.session_state.current_page
 
     # ═══════════════════════════════════════════════════════════════
     #  DASHBOARD
@@ -925,6 +1040,15 @@ def app():
             
         st.markdown("<br>", unsafe_allow_html=True)
         st.caption("Pour ajouter un utilisateur : ajouter une entrée dans USERS.")
+
+    # --- RENDER BOTTOM NAVIGATION (VISUAL ONLY) ---
+    st.markdown(f"""
+        <div class="bottom-nav">
+            {"".join([f'<div class="nav-item {"active" if st.session_state.current_page == p else ""}"><div class="nav-icon">{icons.get(p, "📄")}</div><div class="nav-label">{p}</div></div>' for p in pages])}
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
