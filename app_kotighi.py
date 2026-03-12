@@ -91,6 +91,10 @@ def apply_theme():
     warning  = "#F59E0B"
     success  = "#10B981"
     sidebar_bg = "#0A0B10" if is_dark else "#F8FAFC"
+    
+    # Button Colors
+    btn_bg   = "#FFFFFF" if is_dark else "#1E293B"
+    btn_text = "#06070A" if is_dark else "#FFFFFF"
 
     st.markdown(f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -264,9 +268,9 @@ def apply_theme():
 
     /* ═══ BUTTONS ═══ */
     .stButton > button {{
-        background: {primary} !important;
-        color: #000 !important;
-        border: none !important;
+        background: {btn_bg} !important;
+        color: {btn_text} !important;
+        border: 1px solid {btn_bg} !important;
         border-radius: 12px;
         font-family: 'Inter', sans-serif;
         font-weight: 700;
@@ -276,6 +280,11 @@ def apply_theme():
         transition: all .4s cubic-bezier(.16, 1, 0.3, 1);
         text-transform: uppercase;
         width: 100%;
+    }}
+    .stButton > button:hover {{
+        background: transparent !important;
+        color: {btn_bg} !important;
+        transform: scale(1.02);
     }}
     .stButton > button:hover {{
         transform: scale(1.02);
