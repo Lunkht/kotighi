@@ -420,6 +420,12 @@ def apply_theme():
     }}
     
     </style>""", unsafe_allow_html=True)
+    
+    return {
+        "bg": bg, "bg2": bg2, "text": text, "card": card, 
+        "border": border, "subtext": subtext, "primary": primary,
+        "accent": accent, "danger": danger, "warning": warning, "success": success
+    }
 
 apply_theme()
 
@@ -674,7 +680,11 @@ def render_network_map(results):
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
     # Application du thème globalement
-    apply_theme()
+    colors = apply_theme()
+    # Unpack colors for local scope use
+    bg, bg2, text, card = colors["bg"], colors["bg2"], colors["text"], colors["card"]
+    border, subtext, primary = colors["border"], colors["subtext"], colors["primary"]
+    accent, danger, warning, success = colors["accent"], colors["danger"], colors["warning"], colors["success"]
     
     user = st.session_state.utilisateur
     pages = [p for p in user["acces"] if p in ["Dashboard", "Cybersecurite", "Sante", "Gestion", "Assistant"]]
