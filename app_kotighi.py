@@ -70,7 +70,6 @@ def get_logo_html(fill_color):
     try:
         with open("logo.svg", "r") as f:
             svg = f.read()
-        # Injection couleur et style responsive
         svg = svg.replace("<svg", f'<svg fill="{fill_color}" style="width:100%;height:auto;"')
         return svg
     except FileNotFoundError:
@@ -1102,7 +1101,13 @@ def app():
     #  SANTÉ — MODULE CLINIQUE
     # ═══════════════════════════════════════════════════════════════
     elif page == "Sante":
-        st.markdown("## MODULE SANTÉ", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div style='display:flex; justify-content:space-between; align-items:center;'>
+                <h2 style='margin:0;'>Diagnostic Santé IA</h2>
+                <div style='background:rgba(0,255,136,0.1); color:#00FF88; padding:6px 14px; border-radius:30px; font-size:0.75rem; font-weight:800; border:1px solid rgba(0,255,136,0.2);'>MOTEUR v2.4</div>
+            </div>
+            <p style='color:{subtext}; font-size:0.9rem; margin-top:10px;'>Analyse prédictive basée sur les symptômes et l'historique patient.</p>
+        """, unsafe_allow_html=True)
         st.divider()
         
         ms, labels, conseils_prev = get_sante()
