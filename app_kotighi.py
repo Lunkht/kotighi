@@ -286,11 +286,6 @@ def apply_theme():
         color: {btn_bg} !important;
         transform: scale(1.02);
     }}
-    .stButton > button:hover {{
-        transform: scale(1.02);
-        box-shadow: 0 12px 30px {primary}40;
-        filter: brightness(1.1);
-    }}
 
     /* ═══ TYPOGRAPHY ═══ */
     h1 {{
