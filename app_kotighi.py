@@ -695,7 +695,7 @@ def app():
             <div style="display: flex; align-items: center; gap: 20px;">
                 <div style="text-align: right; line-height: 1.2;">
                     <div style="font-size: 0.9rem; font-weight: 700; color: #E2E8F0;">{user['nom']}</div>
-                    <div style="font-size: 0.72rem; color: #64748B;">{user['login_nom']}@gmail.com</div>
+                    <div style="font-size: 0.72rem; color: #64748B;">{st.session_state.login_nom}@gmail.com</div>
                 </div>
                 <div style="width: 44px; height: 44px; background: url('https://api.dicebear.com/7.x/avataaars/svg?seed={user['nom']}') center/cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"></div>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
