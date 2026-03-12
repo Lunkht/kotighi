@@ -399,6 +399,16 @@ def apply_theme():
     .login-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; min-height: 80vh; }}
     .login-header-text {{ text-align: center; margin-bottom: 2rem; animation: fadeIn 1s ease-out; }}
     
+    /* ═══ MAPS & GRAPHS ═══ */
+    .graph-container {{
+        background: {card} !important;
+        border: 1px solid {border};
+        border-radius: 20px;
+        padding: 15px;
+        margin-top: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }}
+    
     </style>""", unsafe_allow_html=True)
 
 apply_theme()
@@ -570,6 +580,62 @@ def page_login():
         """, unsafe_allow_html=True)
 
 
+# ── UTILS ANALYTIQUES ─────────────────────────────────────────────
+def render_network_map(results):
+    if not results: return
+    
+    # Création du graphe
+    nodes_x = []
+    nodes_y = []
+    node_colors = []
+    node_text = []
+    
+    # Centre du réseau (KOTIGHI)
+    nodes_x.append(0)
+    nodes_y.append(0)
+    node_colors.append("#00E5FF")
+    node_text.append("CENTRE KOTIGHI")
+    
+    for i, res in enumerate(results):
+        angle = 2 * np.pi * i / len(results)
+        dist = 1 + (0.5 if res['Status'] != "OK" else 0)
+        x = dist * np.cos(angle)
+        y = dist * np.sin(angle)
+        
+        nodes_x.append(x)
+        nodes_y.append(y)
+        color = "#EF4444" if res['Status'] == "CRITIQUE" else ("#F59E0B" if res['Status'] == "SUSPECT" else "#10B981")
+        node_colors.append(color)
+        node_text.append(f"IP: {res['IP']}<br>Score: {res['Score']}")
+        
+    fig = go.Figure()
+    
+    # Liens
+    for i in range(1, len(nodes_x)):
+        fig.add_trace(go.Scatter(x=[0, nodes_x[i]], y=[0, nodes_y[i]], 
+                                 line=dict(color="rgba(255,255,255,0.05)", width=1), 
+                                 hoverinfo='none', mode='lines'))
+        
+    # Noeuds
+    fig.add_trace(go.Scatter(x=nodes_x, y=nodes_y, mode='markers',
+                             marker=dict(size=[30] + [20]*(len(nodes_x)-1), color=node_colors, 
+                                         line_width=2, line_color="rgba(255,255,255,0.2)"),
+                             text=node_text, hoverinfo='text'))
+    
+    fig.update_layout(
+        showlegend=False, 
+        paper_bgcolor="rgba(0,0,0,0)", 
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=0, b=0, l=0, r=0),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        height=400
+    )
+    
+    st.markdown("<div class='graph-container'>", unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # ── APPLICATION PRINCIPALE ────────────────────────────────────────
 def app():
     # Application du thème globalement
@@ -714,6 +780,26 @@ def app():
 
         st.markdown("<br>",unsafe_allow_html=True)
         
+        # --- ALERTS SECION ---
+        st.markdown("#### 🚨 Alertes Critiques")
+        alerts = [h for h in st.session_state.historique if h.get("Resultat") in ["CRITIQUE", "URGENT"] or "cardiaque" in str(h.get("Resultat")).lower()]
+        
+        if alerts:
+            for alert in alerts[-3:]: # Show last 3
+                st.markdown(f"""
+                <div class='k-alert-danger' style='margin-bottom:10px; animation: pulseGlow 2s infinite;'>
+                    <div style='display:flex; justify-content:space-between; align-items:center;'>
+                        <b>{alert['Module'].upper()} : {alert['Resultat']}</b>
+                        <span style='font-size:0.7rem; opacity:0.8;'>{alert['Date']}</span>
+                    </div>
+                    <div style='font-size:0.8rem; margin-top:4px;'>{alert['Detail']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.success("Aucune menace critique détectée. Tous les systèmes sont au vert.")
+
+        st.markdown("<br>",unsafe_allow_html=True)
+        
         # RECENT ACTIVITY
         st.markdown("#### 🕒 Dernières Activités")
         if st.session_state.historique:
@@ -810,6 +896,21 @@ def app():
                     st.markdown("### Résultats")
                     df_res = pd.DataFrame(results)
                     st.dataframe(df_res, use_container_width=True)
+                    
+                    # LOGGING PERSISTANT
+                    for res in results:
+                        log_entry = {
+                            "Date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "Module": "Cyber",
+                            "Resultat": res["Status"],
+                            "Confiance": res["Score"],
+                            "Utilisateur": st.session_state.utilisateur["nom"],
+                            "Detail": f"IP {res['IP']}, Ports {res['Ports']}"
+                        }
+                        st.session_state.historique.append(log_entry)
+                        
+                    # Affichage Carte
+                    render_network_map(results)
                 
                 if add_watch and ips_list:
                     new_ips = [ip.strip() for ip in ips_list if ip.strip()]
