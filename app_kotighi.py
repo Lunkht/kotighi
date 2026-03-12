@@ -75,7 +75,7 @@ def get_logo_html(fill_color):
     except FileNotFoundError:
         return ""
 
-def apply_theme(hide_sidebar=False):
+def apply_theme():
     is_dark = st.session_state.theme == "Sombre"
     # — Premium Color Palette —
     # — Phase 4: Monochromatic Dashboard Palette —
@@ -127,10 +127,6 @@ def apply_theme(hide_sidebar=False):
     [data-testid="stSidebar"] {{
         background: {sidebar_bg} !important;
         border-right: 1px solid {border} !important;
-        display: {"none" if hide_sidebar else "flex"} !important;
-    }}
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {{
-        animation: slideInLeft .6s cubic-bezier(0.16, 1, 0.3, 1) both;
     }}
 
     /* ═══ GLASSMORPHISM CORE ═══ */
@@ -154,7 +150,7 @@ def apply_theme(hide_sidebar=False):
         height: 80px;
         background: {bg} !important;
         border-bottom: 1px solid {border};
-        z-index: 999990;
+        z-index: 1000 !important;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -224,14 +220,13 @@ def apply_theme(hide_sidebar=False):
         margin-top: 80px !important;
         padding: 2rem !important;
         max-width: 1400px;
-        margin-left: auto;
-        margin-right: auto;
     }}
 
     /* Hide default Streamlit elements to achieve app look */
     header[data-testid="stHeader"] {{
         background: transparent !important;
         border-bottom: none !important;
+        z-index: 2000 !important;
     }}
     
 
@@ -519,6 +514,9 @@ def simuler_diagnostic(sympt_checks):
 # ── PAGE LOGIN ────────────────────────────────────────────────────
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
+    
+    # Masquer la sidebar sur le login
+    st.markdown("<style>[data-testid='stSidebar'] { display: none !important; }</style>", unsafe_allow_html=True)
     
     # Arrière-plan immersif
     st.markdown("""
@@ -1356,7 +1354,7 @@ def app():
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
-    apply_theme(hide_sidebar=True)
+    apply_theme()
     page_login()
 else:
     app()
