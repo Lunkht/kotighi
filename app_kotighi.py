@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from streamlit_lottie import st_lottie
 
-st.set_page_config(page_title="KOTIGHI AI", layout="wide")
+st.set_page_config(page_title="KOTIGHI AI", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""<style>
 /* Style de base supprimé car géré par apply_theme() */
@@ -75,7 +75,7 @@ def get_logo_html(fill_color):
     except FileNotFoundError:
         return ""
 
-def apply_theme():
+def apply_theme(hide_sidebar=False):
     is_dark = st.session_state.theme == "Sombre"
     # — Premium Color Palette —
     # — Phase 4: Monochromatic Dashboard Palette —
@@ -125,9 +125,9 @@ def apply_theme():
 
     /* ═══ SIDEBAR ═══ */
     [data-testid="stSidebar"] {{
-        display: flex !important;
         background: {sidebar_bg} !important;
         border-right: 1px solid {border} !important;
+        display: {"none" if hide_sidebar else "flex"} !important;
     }}
     [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {{
         animation: slideInLeft .6s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -425,7 +425,7 @@ def apply_theme():
         "accent": accent, "danger": danger, "warning": warning, "success": success
     }
 
-apply_theme()
+# apply_theme() moved to app() and page_login() for stateful control
 
 # ── ANIMATIONS LOTTIE ─────────────────────────────────────────────
 def load_lottieurl(url: str):
@@ -1356,8 +1356,7 @@ def app():
 
 # ── POINT D'ENTREE ────────────────────────────────────────────────
 if not st.session_state.connecte:
-    st.markdown("<style>[data-testid='stSidebar'] { display: none !important; }</style>", unsafe_allow_html=True)
-    apply_theme()
+    apply_theme(hide_sidebar=True)
     page_login()
 else:
     app()
