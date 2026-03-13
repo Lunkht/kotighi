@@ -124,9 +124,22 @@ def apply_theme():
     ::-webkit-scrollbar-thumb:hover {{ background: {primary}60; }}
 
     /* ═══ SIDEBAR ═══ */
-    [data-testid="stSidebar"] {{
+    section[data-testid="stSidebar"] {{
         background: {sidebar_bg} !important;
         border-right: 1px solid {border} !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 1000000 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] {{
+        z-index: 1000001 !important;
+        background: {primary}20 !important;
+        border-radius: 0 10px 10px 0 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] svg {{
+        fill: white !important;
+        color: white !important;
     }}
 
     /* ═══ GLASSMORPHISM CORE ═══ */
@@ -150,12 +163,14 @@ def apply_theme():
         height: 80px;
         background: {bg} !important;
         border-bottom: 1px solid {border};
-        z-index: 1000 !important;
+        z-index: 999997 !important;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 0 2rem;
         animation: fadeIn 0.5s ease-out;
+        /* Prevent covering sidebar toggle */
+        padding-left: 80px; 
     }}
 
     /* Search Bar in Header */
@@ -226,7 +241,7 @@ def apply_theme():
     header[data-testid="stHeader"] {{
         background: transparent !important;
         border-bottom: none !important;
-        z-index: 2000 !important;
+        z-index: 999998 !important;
     }}
     
 
@@ -515,8 +530,7 @@ def simuler_diagnostic(sympt_checks):
 def page_login():
     if "auth_mode" not in st.session_state: st.session_state.auth_mode = "Connexion"
     
-    # Masquer la sidebar sur le login
-    st.markdown("<style>[data-testid='stSidebar'] { display: none !important; }</style>", unsafe_allow_html=True)
+    # Sidebar visibility managed by apply_theme and z-index
     
     # Arrière-plan immersif
     st.markdown("""
@@ -711,7 +725,8 @@ def app():
 
     # SIDEBAR
     with st.sidebar:
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<div style='padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 20px; text-align: center; color: white; font-weight: bold; letter-spacing: 2px;'>KOTIGHI MENU</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # CATEGORY: CORE
         st.markdown("<div class='sidebar-cat'>PRINCIPAL</div>", unsafe_allow_html=True)
